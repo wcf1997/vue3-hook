@@ -88,7 +88,7 @@ export interface ISchema {
 
 export interface IParamsInject<T = any> {
   /** 加载状态 */
-  isLoading: Ref<boolean>;
+  loading: Ref<boolean>;
   /** 静态数据源 */
   tableData?: Ref<T[]>;
   /** 表格列 */
@@ -107,5 +107,5 @@ export interface IParamsInject<T = any> {
   // 操作按钮点击事件
   handleActionButtonClick: (...args: any) => any;
   /** 表格属性 */
-  attrs:any
+  attrs: any;
 }

@@ -40,7 +40,7 @@ export function createUseTable(globalOptions: IUseTableOption) {
     _sizeName = options?.req?.reName?.size || _sizeName;
     _listName = options?.res?.reName?.list || _listName;
     _listTotal = options?.res?.reName?.list || _listTotal;
-    const isLoading = ref(false);
+    const loading = ref(false);
     const tableData = ref<T[]>([]) as Ref<T[]>;
     const pageInfo = reactive({
       [_indexName]: 1,
@@ -106,7 +106,7 @@ export function createUseTable(globalOptions: IUseTableOption) {
       "actions"
     ];
     provide(provideKey, {
-      isLoading,
+      loading,
       columns,
       tableData,
       pageInfo,
@@ -129,4 +129,6 @@ export function createUseTable(globalOptions: IUseTableOption) {
       dataSource: tableData.value
     };
   };
+
+
 }

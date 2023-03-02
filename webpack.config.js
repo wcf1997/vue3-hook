@@ -6,10 +6,11 @@ module.exports = {
   output: {
     path: path.resolve(__dirname, './dist'), //输出路径
     publicPath: '/dist/',
-    filename: 'use-hook.js',
+    filename: 'index.js',
     libraryTarget: 'umd',
     umdNamedDefine: true
   },
+  mode:'development',
   resolve: {
     extensions: [".ts", ".tsx", ".js"] //新增
   },
