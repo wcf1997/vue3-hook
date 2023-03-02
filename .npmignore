@@ -5,7 +5,7 @@
 node_modules
 
 packages/
-
+dist/
 public/
 
 # 忽略指定文件

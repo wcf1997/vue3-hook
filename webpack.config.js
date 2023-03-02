@@ -1,6 +1,8 @@
+
 const path = require("path");
+// const U=require('')
 module.exports = {
-  entry: "./src/index.js", //入口文件
+  entry: "./src/index.ts", //入口文件
   output: {
     path: path.resolve(__dirname, './dist'), //输出路径
     publicPath: '/dist/',
@@ -13,40 +15,33 @@ module.exports = {
   },
   module: {
     rules: [
-      // {
-      //   test: /\.vue$/,
-      //   loader: 'vue-loader'
-      // },
       {
-        test: /\.less$/,
-        use: [{
-            loader: "style-loader"
-          },
-          {
-            loader: "css-loader"
-          },
-          {
-            loader: "less-loader"
-          }
-        ]
+        test: /\.vue$/,
+        loader: 'vue-loader'
       },
+      // {
+      //   test: /\.less$/,
+      //   use: [{
+      //       loader: "style-loader"
+      //     },
+      //     {
+      //       loader: "css-loader"
+      //     },
+      //     {
+      //       loader: "less-loader"
+      //     }
+      //   ]
+      // },
       {
         test: /\.js$/,
         exclude: /node_modules|vue\/dist|vue-router\/|vue-loader\/|vue-hot-reload-api\//,
         loader: 'babel-loader'
       },
-       {
-         test: /\.tsx?$/,
-         loader: "ts-loader"
-       },
       {
-        test: /\.(png|jpg|gif|ttf|svg|woff|eot)$/,
-        loader: 'url-loader',
-        query: {
-          limit: 30000,
-          name: '[name].[ext]?[hash]'
-        }
-      }
+        test: /\.tsx?$/,
+        loader: "ts-loader"
+      },
+
     ]
   },
 }
