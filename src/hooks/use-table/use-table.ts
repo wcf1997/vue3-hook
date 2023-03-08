@@ -34,7 +34,7 @@ export function createUseTable(globalOptions: IUseTableOption) {
     params: IUseTableParams<T>,
     /** 表格属性 */
     props?: any,
-    options?: IUseTableOption
+    options?: Omit<IUseTableOption,'component'>
   ): IUserTableReturn<T> {
     _indexName = options?.req?.reName?.index || _indexName;
     _sizeName = options?.req?.reName?.size || _sizeName;

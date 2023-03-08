@@ -6,12 +6,14 @@ interface IUseList<T = any> {
     params: any;
 }
 interface IUseListOption extends IReq, IRes {
-    component: any;
+    component?: any;
 }
-export declare function createUseList(globalOptions: IUseListOption): <T = any>(params: IUseList<T>, props?: any, options?: IUseListOption) => {
+export declare function createUseList(globalOptions: IUseListOption): <T = any>(params: IUseList<T>, options?: Omit<IUseListOption, "component">) => {
     dataSource: Ref<T[]>;
-    useList: () => import("vue").VNode<import("vue").RendererNode, import("vue").RendererElement, {
+    UseList: () => import("vue").VNode<import("vue").RendererNode, import("vue").RendererElement, {
         [key: string]: any;
     }>;
+    reset: () => void;
+    search: (data: any) => void;
 };
 export {};

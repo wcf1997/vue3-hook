@@ -1,14 +1,14 @@
-import { h, provide, reactive, Ref, ref,  } from "vue";
+import { defineComponent, h, provide, reactive, Ref, ref } from "vue";
 import { IReq, IRes } from "../types";
+import { _token } from "../utils";
 
 interface IUseList<T = any> {
   requestApi: (...args: any) => Promise<any>;
   dataSource: T[];
   params: any;
 }
-let uid = 0;
 interface IUseListOption extends IReq, IRes {
-  component: any;
+  component?: any;
 }
 export function createUseList(globalOptions: IUseListOption) {
   let _indexName = globalOptions.req?.reName?.index || "index";
@@ -17,8 +17,7 @@ export function createUseList(globalOptions: IUseListOption) {
   let _listTotal = globalOptions.res?.reName?.total || "total";
   return function useList<T = any>(
     params: IUseList<T>,
-    props?: any,
-    options?: IUseListOption
+    options?: Omit<IUseListOption, "component">
   ) {
     _indexName = options?.req?.reName?.index || _indexName;
     _sizeName = options?.req?.reName?.size || _sizeName;
@@ -34,7 +33,7 @@ export function createUseList(globalOptions: IUseListOption) {
     });
     const searchInfo = ref({});
 
-    async function getListData():Promise<any> {
+    async function getListData(): Promise<any> {
       if (!params.requestApi) return (finished.value = true);
       // 异步更新数据
       try {
@@ -70,22 +69,34 @@ export function createUseList(globalOptions: IUseListOption) {
       }
     }
 
-    const provideKey = "list_uid_" + uid;
-    provide(provideKey, {
-      getListData,
-      loading,
-      finished
-    });
-    uid++;
-    const UseListVnode = h(options?.component || globalOptions.component, {
-      ...props,
-      provideKey
+    function reset() {
+      pageInfo[_indexName] = 1;
+      searchInfo.value = {};
+      getListData();
+    }
+    function search(data: any) {
+      searchInfo.value = { ...searchInfo, ...data };
+      pageInfo[_indexName] = 1;
+      getListData();
+    }
+    const UseListVnode = defineComponent({
+      setup() {
+        provide(_token, {
+          getListData,
+          loading,
+          finished
+        });
+
+        return () => h(globalOptions.component);
+      }
     });
 
-    const useList = () => UseListVnode;
+    const UseList = () => h(UseListVnode);
     return {
       dataSource: listData,
-      useList
+      UseList,
+      reset,
+      search
     };
   };
 }

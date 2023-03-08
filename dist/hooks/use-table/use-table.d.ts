@@ -17,5 +17,5 @@ interface IUserTableReturn<T = any> {
 interface IUseTableOption extends IReq, IRes {
     component: any;
 }
-export declare function createUseTable(globalOptions: IUseTableOption): <T = any>(params: IUseTableParams<T>, props?: any, options?: IUseTableOption) => IUserTableReturn<T>;
+export declare function createUseTable(globalOptions: IUseTableOption): <T = any>(params: IUseTableParams<T>, props?: any, options?: Omit<IUseTableOption, 'component'>) => IUserTableReturn<T>;
 export {};
