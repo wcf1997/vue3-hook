@@ -4,7 +4,8 @@ import {
   provide,
   ref,
   render,
-  type Component,
+  Teleport,
+  type Component
 } from "vue";
 import { _token } from "../utils";
 
@@ -44,3 +45,37 @@ export function createUseModal(template: Component) {
     });
   };
 }
+
+export function createModalComponent(template: Component) {
+  return function useDialog(content?: Component, data?: any) {
+    const visible = ref<boolean>(false);
+    let closeResolve: any = null;
+    function close(data: any) {
+      visible.value = false;
+      closeResolve(data);
+    }
+
+    const DialogVnode = defineComponent({
+      setup() {
+        provide(_token, {
+          visible,
+          close,
+          content,
+          data
+        });
+        return () => h(template);
+      }
+    });
+
+    const DialogComponent = () => h(Teleport, { to: "body" }, h(DialogVnode));
+
+    function open(): Promise<any> {
+      return new Promise(resolve => {
+        closeResolve = resolve;
+        visible.value = true;
+      });
+    }
+    return { open, DialogComponent };
+  };
+}
+

@@ -17,7 +17,7 @@ export function createUseList(globalOptions: IUseListOption) {
   let _listTotal = globalOptions.res?.reName?.total || "total";
   return function useList<T = any>(
     params: IUseList<T>,
-    options?: Omit<IUseListOption, "component">
+    options?: IUseListOption
   ) {
     _indexName = options?.req?.reName?.index || _indexName;
     _sizeName = options?.req?.reName?.size || _sizeName;

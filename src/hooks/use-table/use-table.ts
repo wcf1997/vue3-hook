@@ -34,7 +34,7 @@ export function createUseTable(globalOptions: IUseTableOption) {
     params: IUseTableParams<T>,
     /** 表格属性 */
     props?: any,
-    options?: Omit<IUseTableOption,'component'>
+    options?: IUseTableOption
   ): IUserTableReturn<T> {
     _indexName = options?.req?.reName?.index || _indexName;
     _sizeName = options?.req?.reName?.size || _sizeName;
@@ -97,7 +97,6 @@ export function createUseTable(globalOptions: IUseTableOption) {
       item.onClick(getTalbeData);
     }
 
-  
     const columns = computed<Omit<IColumns, "actions">[]>(() =>
       params.columns.filter((v: any) => !v.hideInTable && v.type !== "action")
     );
@@ -105,24 +104,24 @@ export function createUseTable(globalOptions: IUseTableOption) {
       "actions"
     ];
 
-     const UseTableVnode = defineComponent({
-       setup() {
-         /** 注入params */
-         provide(_token, {
-           loading,
-           columns: columns,
-           actions,
-           tableData,
-           pageInfo,
-           handlePageChange,
-           handleSizeChange,
-           handleActionButtonClick,
-           tableConfig: props
-         });
+    const UseTableVnode = defineComponent({
+      setup() {
+        /** 注入params */
+        provide(_token, {
+          loading,
+          columns: columns,
+          actions,
+          tableData,
+          pageInfo,
+          handlePageChange,
+          handleSizeChange,
+          handleActionButtonClick,
+          tableConfig: props
+        });
 
-         return () => h(globalOptions.component);
-       }
-     });
+        return () => h(globalOptions.component);
+      }
+    });
 
     const UseTable = () => h(UseTableVnode);
     return {
