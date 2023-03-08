@@ -1,2 +1,3 @@
 import { IParamsInject } from "./use-table/types";
-export declare function useInject(): IParamsInject<any>;
+export declare const _token: unique symbol;
+export declare function useInject<T = IParamsInject>(): T;

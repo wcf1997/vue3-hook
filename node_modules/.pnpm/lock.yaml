@@ -13,6 +13,7 @@ specifiers:
   rollup-plugin-node-resolve: ^5.2.0
   rollup-plugin-typescript: ^1.0.1
   ts-loader: ^9.4.2
+  tslib: ^2.5.0
   typescript: ^4.9.5
   vue: ^3.2.36
   vue-loader: ^17.0.1
@@ -27,13 +28,14 @@ devDependencies:
   '@rollup/plugin-babel': registry.npmmirror.com/@rollup/plugin-babel/6.0.3_a5lozykpytg33uq3o54uvv7c3m
   '@rollup/plugin-commonjs': registry.npmmirror.com/@rollup/plugin-commonjs/24.0.1_rollup@3.18.0
   '@rollup/plugin-node-resolve': registry.npmmirror.com/@rollup/plugin-node-resolve/15.0.1_rollup@3.18.0
-  '@rollup/plugin-typescript': registry.npmmirror.com/@rollup/plugin-typescript/11.0.0_fn2onl6nbsljlgjr3jlzr6w7we
+  '@rollup/plugin-typescript': registry.npmmirror.com/@rollup/plugin-typescript/11.0.0_elyygukqrpnyv7sactoooq5kjq
   release-it: registry.npmmirror.com/release-it/15.7.0
   rollup: registry.npmmirror.com/rollup/3.18.0
   rollup-plugin-commonjs: registry.npmmirror.com/rollup-plugin-commonjs/10.1.0_rollup@3.18.0
   rollup-plugin-node-resolve: registry.npmmirror.com/rollup-plugin-node-resolve/5.2.0_rollup@3.18.0
-  rollup-plugin-typescript: registry.npmmirror.com/rollup-plugin-typescript/1.0.1_typescript@4.9.5
+  rollup-plugin-typescript: registry.npmmirror.com/rollup-plugin-typescript/1.0.1_y2wxofkj373fhto5ciw6eygozi
   ts-loader: registry.npmmirror.com/ts-loader/9.4.2_typescript@4.9.5
+  tslib: registry.npmmirror.com/tslib/2.5.0
   typescript: registry.npmmirror.com/typescript/4.9.5
 
 packages:
@@ -1774,7 +1776,7 @@ packages:
       rollup: registry.npmmirror.com/rollup/3.18.0
     dev: true
 
-  registry.npmmirror.com/@rollup/plugin-typescript/11.0.0_fn2onl6nbsljlgjr3jlzr6w7we:
+  registry.npmmirror.com/@rollup/plugin-typescript/11.0.0_elyygukqrpnyv7sactoooq5kjq:
     resolution: {integrity: sha512-goPyCWBiimk1iJgSTgsehFD5OOFHiAknrRJjqFCudcW8JtWiBlK284Xnn4flqMqg6YAjVG/EE+3aVzrL5qNSzQ==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/@rollup/plugin-typescript/-/plugin-typescript-11.0.0.tgz}
     id: registry.npmmirror.com/@rollup/plugin-typescript/11.0.0
     name: '@rollup/plugin-typescript'
@@ -1793,6 +1795,7 @@ packages:
       '@rollup/pluginutils': registry.npmmirror.com/@rollup/pluginutils/5.0.2_rollup@3.18.0
       resolve: registry.npmmirror.com/resolve/1.22.1
       rollup: registry.npmmirror.com/rollup/3.18.0
+      tslib: registry.npmmirror.com/tslib/2.5.0
       typescript: registry.npmmirror.com/typescript/4.9.5
     dev: true
 
@@ -4784,7 +4787,7 @@ packages:
       rollup-pluginutils: registry.npmmirror.com/rollup-pluginutils/2.8.2
     dev: true
 
-  registry.npmmirror.com/rollup-plugin-typescript/1.0.1_typescript@4.9.5:
+  registry.npmmirror.com/rollup-plugin-typescript/1.0.1_y2wxofkj373fhto5ciw6eygozi:
     resolution: {integrity: sha512-rwJDNn9jv/NsKZuyBb/h0jsclP4CJ58qbvZt2Q9zDIGILF2LtdtvCqMOL+Gq9IVq5MTrTlHZNrn8h7VjQgd8tw==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/rollup-plugin-typescript/-/rollup-plugin-typescript-1.0.1.tgz}
     id: registry.npmmirror.com/rollup-plugin-typescript/1.0.1
     name: rollup-plugin-typescript
@@ -4796,6 +4799,7 @@ packages:
     dependencies:
       resolve: registry.npmmirror.com/resolve/1.22.1
       rollup-pluginutils: registry.npmmirror.com/rollup-pluginutils/2.8.2
+      tslib: registry.npmmirror.com/tslib/2.5.0
       typescript: registry.npmmirror.com/typescript/4.9.5
     dev: true
 
