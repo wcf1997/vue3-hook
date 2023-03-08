@@ -1,5 +1,6 @@
-import { computed, h, provide, reactive, Ref, ref, VNode } from "vue";
+import { computed, defineComponent, h, provide, reactive, Ref, ref, VNode } from "vue";
 import { IReq, IRes } from "../types";
+import { _token } from "../utils";
 import { IColumns } from "./types";
 
 interface IUseTableParams<T = any> {
@@ -19,7 +20,6 @@ interface IUserTableReturn<T = any> {
 interface IUseTableOption extends IReq, IRes {
   component: any;
 }
-let uid = 0;
 
 // // 创建TableVnode
 export function createUseTable(globalOptions: IUseTableOption) {
@@ -97,31 +97,34 @@ export function createUseTable(globalOptions: IUseTableOption) {
       item.onClick(getTalbeData);
     }
 
-    /** 注入params */
-    const provideKey = "table_uid_" + uid;
+  
     const columns = computed<Omit<IColumns, "actions">[]>(() =>
       params.columns.filter((v: any) => !v.hideInTable && v.type !== "action")
     );
     const actions = params.columns.find((v: any) => v.type === "action")?.[
       "actions"
     ];
-    provide(provideKey, {
-      loading,
-      columns,
-      tableData,
-      pageInfo,
-      actions,
-      attrs:props,
-      handlePageChange,
-      handleSizeChange,
-      handleActionButtonClick
-    });
-    uid++;
-    const UseTableVnode = h(options?.component || globalOptions.component, {
-      provideKey
-    });
 
-    const UseTable = () => UseTableVnode;
+     const UseTableVnode = defineComponent({
+       setup() {
+         /** 注入params */
+         provide(_token, {
+           loading,
+           columns: columns,
+           actions,
+           tableData,
+           pageInfo,
+           handlePageChange,
+           handleSizeChange,
+           handleActionButtonClick,
+           tableConfig: props
+         });
+
+         return () => h(globalOptions.component);
+       }
+     });
+
+    const UseTable = () => h(UseTableVnode);
     return {
       UseTable,
       search,

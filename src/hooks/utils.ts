@@ -1,11 +1,9 @@
 
-import { inject, useAttrs } from "vue";
+import { inject } from "vue";
 import { IParamsInject } from "./use-table/types";
 
+export const _token = Symbol('provide token')
 
-
-export function useInject(){
-
-  const attrs:any = useAttrs()
-  return inject(attrs.provideKey as string) as IParamsInject;
+export function useInject<T = IParamsInject>(){
+  return inject(_token) as T;
 }
