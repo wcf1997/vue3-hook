@@ -8,11 +8,10 @@ interface IUseTableParams<T = any> {
   dataSource?: T[];
   columns: Omit<IColumns, "actions">[];
   hidePaginator?: boolean;
-  key: string;
 }
 
 interface IUserTableReturn<T = any> {
-  UseTable: (...args: any) => VNode;
+  UseTableComponent: (...args: any) => VNode;
   search: (...args: any) => any;
   reload: (...args: any) => any;
   dataSource: T[];
@@ -34,7 +33,7 @@ export function createUseTable(globalOptions: IUseTableOption) {
     params: IUseTableParams<T>,
     /** 表格属性 */
     props?: any,
-    options?: IUseTableOption
+    options?: Omit<IUseTableOption,'component'>
   ): IUserTableReturn<T> {
     _indexName = options?.req?.reName?.index || _indexName;
     _sizeName = options?.req?.reName?.size || _sizeName;
@@ -116,16 +115,16 @@ export function createUseTable(globalOptions: IUseTableOption) {
           handlePageChange,
           handleSizeChange,
           handleActionButtonClick,
-          tableConfig: props
+          arrts: props
         });
 
         return () => h(globalOptions.component);
       }
     });
 
-    const UseTable = () => h(UseTableVnode);
+    const UseTableComponent = () => h(UseTableVnode);
     return {
-      UseTable,
+      UseTableComponent,
       search,
       reload,
       dataSource: tableData.value

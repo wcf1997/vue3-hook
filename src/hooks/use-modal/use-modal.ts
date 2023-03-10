@@ -10,6 +10,9 @@ import {
 import { _token } from "../utils";
 
 export function createUseModal(template: Component) {
+    if (!template) {
+      throw new Error("请配置弹窗模板");
+    }
   return function useModal(content?: Component, args?: any): Promise<any> {
     return new Promise(resolve => {
       const visible = ref<boolean>(false);
@@ -47,6 +50,9 @@ export function createUseModal(template: Component) {
 }
 
 export function createModalComponent(template: Component) {
+   if (!template) {
+     throw new Error("请配置弹窗模板");
+   }
   return function useDialog(content?: Component, data?: any) {
     const visible = ref<boolean>(false);
     let closeResolve: any = null;
@@ -67,7 +73,7 @@ export function createModalComponent(template: Component) {
       }
     });
 
-    const DialogComponent = () => h(Teleport, { to: "body" }, h(DialogVnode));
+    const UseDialogComponent = () => h(Teleport, { to: "body" }, h(DialogVnode));
 
     function open(): Promise<any> {
       return new Promise(resolve => {
@@ -75,7 +81,7 @@ export function createModalComponent(template: Component) {
         visible.value = true;
       });
     }
-    return { open, DialogComponent };
+    return { open, UseDialogComponent };
   };
 }
 
