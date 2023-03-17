@@ -1,4 +1,12 @@
-import { defineComponent, h, provide, reactive, Ref, ref } from "vue";
+import {
+  defineComponent,
+  h,
+  provide,
+  reactive,
+  Ref,
+  ref,
+  VNode
+} from "vue";
 import { IReq, IRes } from "../types";
 import { _token } from "../utils";
 
@@ -10,6 +18,12 @@ interface IUseList<T = any> {
 interface IUseListOption extends IReq, IRes {
   component?: any;
 }
+interface IUseListReturn<T = any> {
+  dataSource: Ref<T[]>;
+  UseListComponent: () => VNode;
+  reset: (...args: any) => void;
+  search: (...args: any) => void;
+}
 export function createUseList(globalOptions: IUseListOption) {
   let _indexName = globalOptions.req?.reName?.index || "index";
   let _sizeName = globalOptions.req?.reName?.size || "size";
@@ -18,7 +32,7 @@ export function createUseList(globalOptions: IUseListOption) {
   return function useList<T = any>(
     params: IUseList<T>,
     options?: IUseListOption
-  ) {
+  ): IUseListReturn<T> {
     _indexName = options?.req?.reName?.index || _indexName;
     _sizeName = options?.req?.reName?.size || _sizeName;
     _listName = options?.res?.reName?.list || _listName;
@@ -34,6 +48,12 @@ export function createUseList(globalOptions: IUseListOption) {
     const searchInfo = ref({});
 
     async function getListData(): Promise<any> {
+      if (params.dataSource && params.dataSource.length) {
+        listData.value = params.dataSource;
+        finished.value = true;
+        loading.value = false;
+        return;
+      }
       if (!params.requestApi) return (finished.value = true);
       // 异步更新数据
       try {
@@ -71,6 +91,7 @@ export function createUseList(globalOptions: IUseListOption) {
 
     function reset() {
       pageInfo[_indexName] = 1;
+      pageInfo[_listTotal] = 0
       searchInfo.value = {};
       getListData();
     }
@@ -79,6 +100,7 @@ export function createUseList(globalOptions: IUseListOption) {
       pageInfo[_indexName] = 1;
       getListData();
     }
+
     const UseListVnode = defineComponent({
       setup() {
         provide(_token, {
@@ -91,10 +113,10 @@ export function createUseList(globalOptions: IUseListOption) {
       }
     });
 
-    const UseList = () => h(UseListVnode);
+    const UseListComponent = () => h(UseListVnode);
     return {
       dataSource: listData,
-      UseList,
+      UseListComponent,
       reset,
       search
     };

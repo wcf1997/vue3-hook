@@ -1,6 +1,6 @@
 # vue3-hook
 ## createUseTable
-### 接受一个IUseTableOption类型参数
+### 接收一个IUseTableOption类型参数
 
 | 参数名   | 是否必填 | 默认值  | 描述   |
 |--------|--------|--------|--------|
@@ -102,7 +102,7 @@ let {
   columns, // 表格展示列数据
   loading, //  异步数据加载状态
   pageInfo, // 当前分页数据
-  tableData,// 表哥数据源
+  tableData,// 表格数据源
   handleSizeChange, // 分页大小change事件
   handlePageChange, // 分页当前页change事件
   handleActionButtonClick, // 操作列按钮事件
