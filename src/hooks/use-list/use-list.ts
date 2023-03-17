@@ -12,9 +12,9 @@ import { IReq, IRes } from "../types";
 import { _token } from "../utils";
 
 interface IUseList<T = any> {
-  requestApi: (...args: any) => Promise<any>;
-  dataSource: T[];
-  params: any;
+  requestApi?: (...args: any) => Promise<any>;
+  dataSource?: T[];
+  params?: any;
 }
 interface IUseListOption extends IReq, IRes {
   component?: any;
