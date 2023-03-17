@@ -5,6 +5,7 @@ import {
   reactive,
   Ref,
   ref,
+  unref,
   VNode
 } from "vue";
 import { IReq, IRes } from "../types";
@@ -19,7 +20,7 @@ interface IUseListOption extends IReq, IRes {
   component?: any;
 }
 interface IUseListReturn<T = any> {
-  dataSource: Ref<T[]>;
+  dataSource: T[];
   UseListComponent: () => VNode;
   reset: (...args: any) => void;
   search: (...args: any) => void;
@@ -106,7 +107,8 @@ export function createUseList(globalOptions: IUseListOption) {
         provide(_token, {
           getListData,
           loading,
-          finished
+          finished,
+          dataSource:listData
         });
 
         return () => h(globalOptions.component);
@@ -115,7 +117,7 @@ export function createUseList(globalOptions: IUseListOption) {
 
     const UseListComponent = () => h(UseListVnode);
     return {
-      dataSource: listData,
+      dataSource: unref(listData),
       UseListComponent,
       reset,
       search

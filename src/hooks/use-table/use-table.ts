@@ -1,4 +1,4 @@
-import { computed, defineComponent, h, provide, reactive, Ref, ref, VNode } from "vue";
+import { computed, defineComponent, h, provide, reactive, Ref, ref, unref, VNode } from "vue";
 import { IReq, IRes } from "../types";
 import { _token } from "../utils";
 import { IColumns } from "./types";
@@ -127,7 +127,7 @@ export function createUseTable(globalOptions: IUseTableOption) {
       UseTableComponent,
       search,
       reload,
-      dataSource: tableData.value
+      dataSource: unref(tableData)
     };
   };
 
