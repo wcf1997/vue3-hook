@@ -1,14 +1,17 @@
 import {
+  Component,
   defineComponent,
   h,
   provide,
   reactive,
   Ref,
   ref,
+  Slot,
   unref,
   VNode
 } from "vue";
 import { IReq, IRes } from "../types";
+import { IColumns } from "../use-table/types";
 import { _token } from "../utils";
 
 interface IUseList<T = any> {
@@ -21,10 +24,11 @@ interface IUseListOption extends IReq, IRes {
 }
 interface IUseListReturn<T = any> {
   dataSource: T[];
-  UseListComponent: () => VNode;
+  UseListComponent:Component;
   reset: (...args: any) => void;
   search: (...args: any) => void;
 }
+
 export function createUseList(globalOptions: IUseListOption) {
   let _indexName = globalOptions.req?.reName?.index || "index";
   let _sizeName = globalOptions.req?.reName?.size || "size";
@@ -96,7 +100,7 @@ export function createUseList(globalOptions: IUseListOption) {
       getListData();
     }
 
-    const UseListVnode = defineComponent({
+    const UseListComponent = defineComponent({
       setup() {
         if (params.dataSource && params.dataSource.length) {
           listData.value = params.dataSource;
@@ -113,20 +117,16 @@ export function createUseList(globalOptions: IUseListOption) {
 
         return () => (
           <globalOptions.component>
-            {({ data }: { data: any }) => (
-              <div class="h-30px bg-red">
-                {
-                  //@ts-ignore
-                  slots.default(data)
-                }
-              </div>
+            {({ data }: { data: T }) => (
+              //@ts-ignore
+                 slots.default(data)
             )}
           </globalOptions.component>
         );
       }
     });
 
-    const UseListComponent = () => h(UseListVnode);
+
     return {
       dataSource: unref(listData),
       UseListComponent,

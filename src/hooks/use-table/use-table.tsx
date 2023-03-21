@@ -1,4 +1,4 @@
-import { computed, defineComponent, h, provide, reactive, Ref, ref, unref, VNode } from "vue";
+import { Component, computed, defineComponent, h, provide, reactive, Ref, ref, unref,  } from "vue";
 import { IReq, IRes } from "../types";
 import { _token } from "../utils";
 import { IColumns } from "./types";
@@ -11,7 +11,7 @@ interface IUseTableParams<T = any> {
 }
 
 interface IUserTableReturn<T = any> {
-  UseTableComponent: (...args: any) => VNode;
+  UseTableComponent: Component;
   search: (...args: any) => any;
   reload: (...args: any) => any;
   dataSource: T[];
@@ -103,7 +103,7 @@ export function createUseTable(globalOptions: IUseTableOption) {
       "actions"
     ];
 
-    const UseTableVnode = defineComponent({
+    const UseTableComponent = defineComponent({
       setup() {
         /** 注入params */
         provide(_token, {
@@ -118,11 +118,10 @@ export function createUseTable(globalOptions: IUseTableOption) {
           arrts: props
         });
 
-        return () => h(globalOptions.component);
+        return () => <globalOptions.component></globalOptions.component>;
       }
     });
 
-    const UseTableComponent = () => h(UseTableVnode);
     return {
       UseTableComponent,
       search,
