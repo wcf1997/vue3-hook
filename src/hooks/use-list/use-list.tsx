@@ -49,12 +49,6 @@ export function createUseList(globalOptions: IUseListOption) {
     const searchInfo = ref({});
 
     async function getListData(): Promise<any> {
-      if (params.dataSource && params.dataSource.length) {
-        listData.value = params.dataSource;
-        finished.value = true;
-        loading.value = false;
-        return;
-      }
       if (!params.requestApi) return (finished.value = true);
       // 异步更新数据
       try {
@@ -92,7 +86,7 @@ export function createUseList(globalOptions: IUseListOption) {
 
     function reset() {
       pageInfo[_indexName] = 1;
-      pageInfo[_listTotal] = 0
+      pageInfo[_listTotal] = 0;
       searchInfo.value = {};
       getListData();
     }
@@ -104,14 +98,31 @@ export function createUseList(globalOptions: IUseListOption) {
 
     const UseListVnode = defineComponent({
       setup() {
+        if (params.dataSource && params.dataSource.length) {
+          listData.value = params.dataSource;
+          finished.value = true;
+          loading.value = false;
+          return;
+        }
         provide(_token, {
           getListData,
           loading,
           finished,
-          dataSource:listData
+          dataSource: listData
         });
 
-        return () => h(globalOptions.component);
+        return () => (
+          <globalOptions.component>
+            {({ data }: { data: any }) => (
+              <div class="h-30px bg-red">
+                {
+                  //@ts-ignore
+                  slots.default(data)
+                }
+              </div>
+            )}
+          </globalOptions.component>
+        );
       }
     });
 

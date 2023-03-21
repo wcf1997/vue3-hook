@@ -5,9 +5,10 @@
     "vue": ["node_modules/vue/dist/vue.d.ts"]
   },
   "compilerOptions": {
+    "jsx": "preserve",
     "target": "es2015",
     "module": "CommonJS",
-    "moduleResolution":"node",
+    "moduleResolution": "node",
     "declaration": true,
     "allowJs": true,
     "outDir": "./dist",
