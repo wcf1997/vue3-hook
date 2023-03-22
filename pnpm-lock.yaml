@@ -7,6 +7,7 @@ specifiers:
   '@rollup/plugin-commonjs': ^24.0.1
   '@rollup/plugin-node-resolve': ^15.0.1
   '@rollup/plugin-typescript': ^11.0.0
+  acorn-jsx: ^5.3.2
   release-it: ^15.7.0
   rollup: ^3.18.0
   rollup-plugin-commonjs: ^10.1.0
@@ -19,6 +20,7 @@ specifiers:
   vue-loader: ^17.0.1
 
 dependencies:
+  acorn-jsx: registry.npmmirror.com/acorn-jsx/5.3.2
   vue: registry.npmmirror.com/vue/3.2.36
   vue-loader: registry.npmmirror.com/vue-loader/17.0.1_vue@3.2.36
 
@@ -1974,6 +1976,14 @@ packages:
     resolution: {integrity: sha512-JtB41wXl7Au3+Nl3gD16Cfpj7k/6aCroZ6BbOiCMFCMvrOpkg/qQUXTso2XowaNqBbnkuGHurLAqkLBxNGc1hQ==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/@vue/shared/-/shared-3.2.36.tgz}
     name: '@vue/shared'
     version: 3.2.36
+    dev: false
+
+  registry.npmmirror.com/acorn-jsx/5.3.2:
+    resolution: {integrity: sha512-rq9s+JNhf0IChjtDXxllJ7g41oZk5SlXtp0LHwyA5cejwn7vKmKp4pPri6YEePv2PU65sAsegbXtIinmDFDXgQ==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/acorn-jsx/-/acorn-jsx-5.3.2.tgz}
+    name: acorn-jsx
+    version: 5.3.2
+    peerDependencies:
+      acorn: ^6.0.0 || ^7.0.0 || ^8.0.0
     dev: false
 
   registry.npmmirror.com/acorn-walk/8.2.0:

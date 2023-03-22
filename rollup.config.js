@@ -2,7 +2,7 @@ import resolve from "@rollup/plugin-node-resolve";
 import babel from "@rollup/plugin-babel";
 import commonjs from "@rollup/plugin-commonjs";
 import typescript from "@rollup/plugin-typescript";
-
+import jsx from 'acorn-jsx'
 export default {
   input: "./src/index.ts", // 打包入口
   output: {
@@ -12,6 +12,7 @@ export default {
     name: "utilibs", // cdn方式引入时挂载在window上面用的就是这个名字
     sourcemap: true,
   },
+  acornInjectPlugins: [jsx()],
   plugins: [
     // 打包插件
     resolve(), // 查找和打包node_modules中的第三方模块
