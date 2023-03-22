@@ -146,9 +146,7 @@ export function createUseTable(globalOptions: IUseTableOption) {
         });
         const _collectSlots = collectSlots(params.columns, slots);
 
-        return (
-          <globalOptions.component>{_collectSlots}</globalOptions.component>
-        );
+        return () => <globalOptions.component>{_collectSlots}</globalOptions.component>
       }
     });
 

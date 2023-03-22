@@ -128,7 +128,7 @@ export function createUseList(globalOptions: IUseListOption) {
           dataSource: dataSource
         });
 
-        return (
+        return () => (
           <globalOptions.component>
             {({ data }: { data: T }) =>
               //@ts-ignore
