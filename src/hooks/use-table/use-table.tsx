@@ -1,4 +1,14 @@
-import { Component, computed, defineComponent, h, provide, reactive, Ref, ref, unref,  } from "vue";
+import {
+  Component,
+  computed,
+  defineComponent,
+  h,
+  provide,
+  reactive,
+  Ref,
+  ref,
+  unref
+} from "vue";
 import { IReq, IRes } from "../types";
 import { _token } from "../utils";
 import { IColumns } from "./types";
@@ -20,6 +30,23 @@ interface IUseTableOption extends IReq, IRes {
   component: any;
 }
 
+/** 收集插槽 */
+function collectSlots<T = any>(
+  columns: Omit<IColumns, "actions">[],
+  slot: any
+) {
+  const slots: any = {};
+  if (!columns || !columns.length) return;
+  for (const item of columns) {
+    if (item["slot"]) {
+      //@ts-ignore
+      slots[item.slot] = (data: { data: T }) => slot[item.slot](data);
+    }
+  }
+
+  return slots;
+}
+
 // // 创建TableVnode
 export function createUseTable(globalOptions: IUseTableOption) {
   if (!globalOptions.component) {
@@ -33,7 +60,7 @@ export function createUseTable(globalOptions: IUseTableOption) {
     params: IUseTableParams<T>,
     /** 表格属性 */
     props?: any,
-    options?: Omit<IUseTableOption,'component'>
+    options?: Omit<IUseTableOption, "component">
   ): IUserTableReturn<T> {
     _indexName = options?.req?.reName?.index || _indexName;
     _sizeName = options?.req?.reName?.size || _sizeName;
@@ -104,7 +131,7 @@ export function createUseTable(globalOptions: IUseTableOption) {
     ];
 
     const UseTableComponent = defineComponent({
-      setup() {
+      setup(props, { slots }) {
         /** 注入params */
         provide(_token, {
           loading,
@@ -117,8 +144,11 @@ export function createUseTable(globalOptions: IUseTableOption) {
           handleActionButtonClick,
           arrts: props
         });
+        const _collectSlots = collectSlots(params.columns, slots);
 
-        return () => <globalOptions.component></globalOptions.component>;
+        return () => (
+          <globalOptions.component>{_collectSlots}</globalOptions.component>
+        );
       }
     });
 
@@ -129,6 +159,4 @@ export function createUseTable(globalOptions: IUseTableOption) {
       dataSource: unref(tableData)
     };
   };
-
-
 }
