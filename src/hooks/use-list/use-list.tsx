@@ -1,32 +1,35 @@
 import {
   Component,
   defineComponent,
-  h,
+  isRef,
   provide,
   reactive,
   Ref,
   ref,
-  Slot,
-  unref,
-  VNode
+  unref
 } from "vue";
 import { IReq, IRes } from "../types";
-import { IColumns } from "../use-table/types";
 import { _token } from "../utils";
 
 interface IUseList<T = any> {
   requestApi?: (...args: any) => Promise<any>;
-  dataSource?: T[];
+  dataSource?: T[] | Ref<T[]>;
   params?: any;
 }
 interface IUseListOption extends IReq, IRes {
   component?: any;
 }
 interface IUseListReturn<T = any> {
-  dataSource: T[];
-  UseListComponent:Component;
+  /** 静态数据源 */
+  dataSource: Ref<T[]>;
+  /** 生成的list组件 */
+  UseListComponent: Component;
+  /** 重置 */
   reset: (...args: any) => void;
+  /** 搜索 */
   search: (...args: any) => void;
+  /** 重新设置静态数据 */
+  setDataSource: (data: T[]) => void;
 }
 
 export function createUseList(globalOptions: IUseListOption) {
@@ -44,7 +47,7 @@ export function createUseList(globalOptions: IUseListOption) {
     _listTotal = options?.res?.reName?.list || _listTotal;
     const finished = ref(false);
     const loading = ref(false);
-    const listData = ref<T[]>([]) as Ref<T[]>;
+    const dataSource = ref<T[]>([]) as Ref<T[]>;
     const pageInfo = reactive({
       [_indexName]: 0,
       [_sizeName]: 10,
@@ -52,7 +55,7 @@ export function createUseList(globalOptions: IUseListOption) {
     });
     const searchInfo = ref({});
 
-    async function getListData(): Promise<any> {
+    async function getDataSource(): Promise<any> {
       if (!params.requestApi) return (finished.value = true);
       // 异步更新数据
       try {
@@ -70,7 +73,10 @@ export function createUseList(globalOptions: IUseListOption) {
           return;
         }
 
-        listData.value = [...listData.value, ...eval(`res.data.${_listName}`)];
+        dataSource.value = [
+          ...dataSource.value,
+          ...eval(`res.data.${_listName}`)
+        ];
         pageInfo.total = eval(`res.data.${_listTotal}`) || 0;
 
         // total.value =
@@ -78,7 +84,7 @@ export function createUseList(globalOptions: IUseListOption) {
         loading.value = false;
 
         // 数据全部加载完成
-        if (listData.value.length >= pageInfo.total) {
+        if (dataSource.value.length >= pageInfo.total) {
           finished.value = true;
         }
       } catch (error) {
@@ -92,46 +98,53 @@ export function createUseList(globalOptions: IUseListOption) {
       pageInfo[_indexName] = 1;
       pageInfo[_listTotal] = 0;
       searchInfo.value = {};
-      getListData();
+      getDataSource();
     }
     function search(data: any) {
       searchInfo.value = { ...searchInfo, ...data };
       pageInfo[_indexName] = 1;
-      getListData();
+      getDataSource();
+    }
+    /** 重新设置静态数据 */
+    function setDataSource(data: T[]) {
+      dataSource.value = data;
     }
 
     const UseListComponent = defineComponent({
       setup() {
-        if (params.dataSource && params.dataSource.length) {
-          listData.value = params.dataSource;
+        if (params.dataSource) {
+          if (isRef(params.dataSource)) {
+            dataSource.value = params.dataSource.value;
+          } else {
+            dataSource.value = [...params.dataSource];
+          }
           finished.value = true;
           loading.value = false;
-          return;
         }
         provide(_token, {
-          getListData,
+          getDataSource,
           loading,
           finished,
-          dataSource: listData
+          dataSource: dataSource
         });
 
-        return () => (
+        return (
           <globalOptions.component>
-            {({ data }: { data: T }) => (
+            {({ data }: { data: T }) =>
               //@ts-ignore
-                 slots.default(data)
-            )}
+              slots.default(data)
+            }
           </globalOptions.component>
         );
       }
     });
 
-
     return {
-      dataSource: unref(listData),
+      dataSource,
       UseListComponent,
       reset,
-      search
+      search,
+      setDataSource
     };
   };
 }
