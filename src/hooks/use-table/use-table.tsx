@@ -2,7 +2,6 @@ import {
   Component,
   computed,
   defineComponent,
-  h,
   provide,
   reactive,
   Ref,
@@ -59,7 +58,7 @@ export function createUseTable(globalOptions: IUseTableOption) {
   return function useTable<T = any>(
     params: IUseTableParams<T>,
     /** 表格属性 */
-    props?: any,
+    // props?: any,
     options?: Omit<IUseTableOption, "component">
   ): IUserTableReturn<T> {
     _indexName = options?.req?.reName?.index || _indexName;
