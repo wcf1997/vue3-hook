@@ -41,7 +41,7 @@ export default {
   acornInjectPlugins: [jsx()],
 
   // 忽略打包文件数组
-  external: ["vue", "@antv/g2"],
+  external: ["vue", "vue-loader"],
   plugins: [
     // 打包插件
     commonjs({
