@@ -6,7 +6,7 @@ import {
   reactive,
   Ref,
   ref,
-
+  h
 } from "vue";
 import { IReq, IRes } from "../types";
 import { _token } from "../utils";
@@ -111,7 +111,7 @@ export function createUseList(globalOptions: IUseListOption) {
     }
 
     const UseListComponent = defineComponent({
-      setup() {
+      setup(props, { slots }) {
         if (params.dataSource) {
           if (isRef(params.dataSource)) {
             dataSource.value = params.dataSource.value;
@@ -127,15 +127,22 @@ export function createUseList(globalOptions: IUseListOption) {
           finished,
           dataSource: dataSource
         });
-
-        return () => (
-          <globalOptions.component>
-            {({ data }: { data: T }) =>
-              //@ts-ignore
-              slots.default(data)
-            }
-          </globalOptions.component>
-        );
+        // jsx实现方式
+        // return () => (
+        //   <globalOptions.component>
+        //     {({ data }: { data: T }) =>
+        //       //@ts-ignore
+        //       slots.default(data)
+        //     }
+        //   </globalOptions.component>
+        // );
+        // h函数实现
+        return () =>
+          h(globalOptions.component, null, {
+            default: (data: { index: number;text:string, data: T }) =>
+            //@ts-ignore
+              slots.default(data.data)
+          });
       }
     });
 

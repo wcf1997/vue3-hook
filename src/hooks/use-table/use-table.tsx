@@ -6,7 +6,8 @@ import {
   reactive,
   Ref,
   ref,
-  unref
+  unref,
+  h
 } from "vue";
 import { IReq, IRes } from "../types";
 import { _token } from "../utils";
@@ -39,7 +40,7 @@ function collectSlots<T = any>(
   for (const item of columns) {
     if (item["slot"]) {
       //@ts-ignore
-      slots[item.slot] = (data: { data: T }) => slot[item.slot](data);
+      slots[item.slot] = (data: { index:number,text:string,data:T }) => slot[item.slot](data.data);
     }
   }
 
@@ -144,8 +145,10 @@ export function createUseTable(globalOptions: IUseTableOption) {
           arrts: props
         });
         const _collectSlots = collectSlots(params.columns, slots);
-
-        return () => <globalOptions.component>{_collectSlots}</globalOptions.component>
+        // jsx实现
+        // return () => <globalOptions.component>{_collectSlots}</globalOptions.component>
+        // h实现
+        return () => h(globalOptions.component,null,_collectSlots)
       }
     });
 
