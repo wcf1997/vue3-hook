@@ -85,7 +85,7 @@ export function createUseTable(globalOptions: IUseTableOption) {
       try {
         const res = await params?.requestApi({ ...pageInfo, ...searchInfo });
         if (!res.success) return;
-        pageInfo.total = eval(`res.data.${_listTotal}`);
+        pageInfo.total = eval(`res.data.${_listTotal}`); 
         tableData.value = eval(`res.data.${_listName}`);
       } catch (error) {
         console.log(error);
