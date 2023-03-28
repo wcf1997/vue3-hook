@@ -23,7 +23,6 @@ specifiers:
   vue-loader: ^17.0.1
 
 dependencies:
-  acorn-jsx: registry.npmmirror.com/acorn-jsx/5.3.2
   rollup-plugin-esbuild: registry.npmmirror.com/rollup-plugin-esbuild/5.0.0_rollup@3.18.0
   rollup-plugin-vue-jsx-compat: registry.npmmirror.com/rollup-plugin-vue-jsx-compat/0.0.6
   vue: registry.npmmirror.com/vue/3.2.36
@@ -37,6 +36,7 @@ devDependencies:
   '@rollup/plugin-node-resolve': registry.npmmirror.com/@rollup/plugin-node-resolve/15.0.1_rollup@3.18.0
   '@rollup/plugin-typescript': registry.npmmirror.com/@rollup/plugin-typescript/11.0.0_elyygukqrpnyv7sactoooq5kjq
   '@vue/babel-plugin-jsx': registry.npmmirror.com/@vue/babel-plugin-jsx/1.1.1_@babel+core@7.21.0
+  acorn-jsx: registry.npmmirror.com/acorn-jsx/5.3.2
   release-it: registry.npmmirror.com/release-it/15.7.0
   rollup: registry.npmmirror.com/rollup/3.18.0
   rollup-plugin-commonjs: registry.npmmirror.com/rollup-plugin-commonjs/10.1.0_rollup@3.18.0
@@ -2037,7 +2037,7 @@ packages:
     version: 5.3.2
     peerDependencies:
       acorn: ^6.0.0 || ^7.0.0 || ^8.0.0
-    dev: false
+    dev: true
 
   registry.npmmirror.com/acorn-walk/8.2.0:
     resolution: {integrity: sha512-k+iyHEuPgSw6SbuDpGQM+06HQUa04DZ3o+F6CSzXMvvI5KMvnaEqXe+YVe555R9nn6GPt404fos4wcgpw12SDA==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/acorn-walk/-/acorn-walk-8.2.0.tgz}
