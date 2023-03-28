@@ -46,6 +46,7 @@ export default {
     // 打包插件
     commonjs({
       extensions: ['.js', '.jsx', '.ts', '.tsx'],
+      
       sourceMap: true
     }),
     typescript({
