@@ -3,9 +3,9 @@ import commonjs from "@rollup/plugin-commonjs";
 import typescript from "@rollup/plugin-typescript";
 import resolve from "@rollup/plugin-node-resolve";
 import jsx from "acorn-jsx";
-import esbuild from "rollup-plugin-esbuild";
 
-function setOutput(){
+
+function setOutput() {
   const path = 'dist/'; // 编译后代码存放地址
   const output = [];
 
@@ -44,14 +44,10 @@ export default {
   external: ["vue", "@antv/g2"],
   plugins: [
     // 打包插件
-    vueJsx(),
-    esbuild({
-      jsxFactory: "vueJsxCompat",
+    commonjs({
+      extensions: ['.js', '.jsx', '.ts', '.tsx'],
+      sourceMap: true
     }),
-     commonjs({
-       extensions,
-       sourceMap: true
-     }),
     typescript({
       lib: ["es5", "es6", "dom"],
       target: "es5", // 输出目标
