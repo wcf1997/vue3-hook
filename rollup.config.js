@@ -4,7 +4,7 @@ import commonjs from "@rollup/plugin-commonjs";
 import typescript from "@rollup/plugin-typescript";
 import vueJsx from "rollup-plugin-vue-jsx-compat"
 import esbuild from "rollup-plugin-esbuild";
-import resolve from '@rollup/plugin-node-resolve';
+
 
 export default {
   input: "./src/index.ts", // 打包入口
@@ -21,7 +21,6 @@ export default {
     esbuild({
       jsxFactory: "vueJsxCompat",
     }),
-    resolve(), // 查找和打包node_modules中的第三方模块
     commonjs(), // 将 CommonJS 转换成 ES2015 模块供 Rollup 处理
     typescript(), // 解析TypeScript
     babel({
