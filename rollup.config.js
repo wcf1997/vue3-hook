@@ -4,7 +4,8 @@ import commonjs from "@rollup/plugin-commonjs";
 import typescript from "@rollup/plugin-typescript";
 import vueJsx from "rollup-plugin-vue-jsx-compat"
 import esbuild from "rollup-plugin-esbuild";
-import jsx from 'acorn-jsx'
+import resolve from '@rollup/plugin-node-resolve';
+
 export default {
   input: "./src/index.ts", // 打包入口
   output: {
@@ -14,7 +15,6 @@ export default {
     name: "utilibs", // cdn方式引入时挂载在window上面用的就是这个名字
     sourcemap: true,
   },
-  acornInjectPlugins: [jsx()],
   plugins: [
     // 打包插件
     vueJsx(),
@@ -25,6 +25,7 @@ export default {
     commonjs(), // 将 CommonJS 转换成 ES2015 模块供 Rollup 处理
     typescript(), // 解析TypeScript
     babel({
+      extensions: ['.js', '.jsx', '.ts', '.tsx'],
       babelHelpers: "bundled"
     }), // babel配置,编译es6
   ],
