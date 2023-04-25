@@ -353,29 +353,28 @@ function createModalComponent(template) {
   return function useDialog(content, args) {
     var visible = ref(false);
     var closeResolve = null;
+    var arguements = args || {};
     function close(data) {
       visible.value = false;
       closeResolve(data);
     }
-    var DialogVnode = defineComponent({
+    var UseDialogComponent = defineComponent({
       setup: function setup() {
         provide(_token, {
           visible: visible,
           close: close,
           content: content,
-          args: args
+          args: arguements
         });
         return function () {
-          return h(template);
+          return h(Teleport, {
+            to: "body"
+          }, h(template));
         };
       }
     });
-    var UseDialogComponent = function UseDialogComponent() {
-      return h(Teleport, {
-        to: "body"
-      }, h(DialogVnode));
-    };
-    function open() {
+    function open(args) {
+      arguements = __assign(__assign({}, arguements), args);
       return new Promise(function (resolve) {
         closeResolve = resolve;
         visible.value = true;
