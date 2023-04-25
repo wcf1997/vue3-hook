@@ -53,7 +53,7 @@ export function createModalComponent(template: Component) {
    if (!template) {
      throw new Error("请配置弹窗模板");
    }
-  return function useDialog(content?: Component, data?: any) {
+  return function useDialog(content?: Component, args?: any) {
     const visible = ref<boolean>(false);
     let closeResolve: any = null;
     function close(data: any) {
@@ -67,7 +67,7 @@ export function createModalComponent(template: Component) {
           visible,
           close,
           content,
-          data
+          args
         });
         return () => h(template);
       }

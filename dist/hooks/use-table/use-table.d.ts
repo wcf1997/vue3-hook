@@ -13,8 +13,11 @@ interface IUserTableReturn<T = any> {
     reload: (...args: any) => any;
     dataSource: T[];
 }
+interface IExt {
+    [propName: string]: any;
+}
 interface IUseTableOption extends IReq, IRes {
     component: any;
 }
-export declare function createUseTable(globalOptions: IUseTableOption): <T = any>(params: IUseTableParams<T>, options?: Omit<IUseTableOption, "component">) => IUserTableReturn<T>;
+export declare function createUseTable(globalOptions: IUseTableOption): <T = any>(params: IUseTableParams<T>, options?: Omit<IUseTableOption, "component"> & IExt) => IUserTableReturn<T>;
 export {};

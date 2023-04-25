@@ -1,4 +1,4 @@
-import { inject, ref, reactive, computed, defineComponent, provide, createVNode, unref, isVNode, h, render, Teleport, isRef } from 'vue';
+import { inject, ref, reactive, computed, defineComponent, provide, h, unref, render, Teleport, isRef } from 'vue';
 
 /******************************************************************************
 Copyright (c) Microsoft Corporation.
@@ -155,9 +155,6 @@ function useInject() {
 }
 
 /** 收集插槽 */
-function _isSlot(s) {
-  return typeof s === 'function' || Object.prototype.toString.call(s) === '[object Object]' && !isVNode(s);
-}
 function collectSlots(columns, slot) {
   var slots = {};
   if (!columns || !columns.length) return;
@@ -165,7 +162,7 @@ function collectSlots(columns, slot) {
     if (item["slot"]) {
       //@ts-ignore
       slots[item.slot] = function (data) {
-        return slot[item.slot](data);
+        return slot[item.slot](data.data);
       };
     }
   };
@@ -294,12 +291,11 @@ function createUseTable(globalOptions) {
           arrts: props
         });
         var _collectSlots = collectSlots(params.columns, slots);
+        // jsx实现
+        // return () => <globalOptions.component>{_collectSlots}</globalOptions.component>
+        // h实现
         return function () {
-          return createVNode(globalOptions.component, null, _isSlot(_collectSlots) ? _collectSlots : {
-            "default": function _default() {
-              return [_collectSlots];
-            }
-          });
+          return h(globalOptions.component, null, _collectSlots);
         };
       }
     });
@@ -354,7 +350,7 @@ function createModalComponent(template) {
   if (!template) {
     throw new Error("请配置弹窗模板");
   }
-  return function useDialog(content, data) {
+  return function useDialog(content, args) {
     var visible = ref(false);
     var closeResolve = null;
     function close(data) {
@@ -367,7 +363,7 @@ function createModalComponent(template) {
           visible: visible,
           close: close,
           content: content,
-          data: data
+          args: args
         });
         return function () {
           return h(template);
@@ -471,7 +467,9 @@ function createUseList(globalOptions) {
       dataSource.value = data;
     }
     var UseListComponent = defineComponent({
-      setup: function setup() {
+      //@ts-ignore
+      setup: function setup(props, _a) {
+        var slots = _a.slots;
         if (params.dataSource) {
           if (isRef(params.dataSource)) {
             dataSource.value = params.dataSource.value;
@@ -487,12 +485,21 @@ function createUseList(globalOptions) {
           finished: finished,
           dataSource: dataSource
         });
+        // jsx实现方式
+        // return () => (
+        //   <globalOptions.component>
+        //     {({ data }: { data: T }) =>
+        //       //@ts-ignore
+        //       slots.default(data)
+        //     }
+        //   </globalOptions.component>
+        // );
+        // h函数实现
         return function () {
-          return createVNode(globalOptions.component, null, {
-            "default": function _default(_a) {
-              var data = _a.data;
+          return h(globalOptions.component, null, {
+            "default": function _default(data) {
               //@ts-ignore
-              return slots["default"](data);
+              return slots["default"](data.data);
             }
           });
         };

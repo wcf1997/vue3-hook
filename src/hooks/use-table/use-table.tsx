@@ -26,8 +26,12 @@ interface IUserTableReturn<T = any> {
   reload: (...args: any) => any;
   dataSource: T[];
 }
+interface IExt  {
+  [propName:string] : any
+}
 interface IUseTableOption extends IReq, IRes {
   component: any;
+
 }
 
 /** 收集插槽 */
@@ -60,7 +64,7 @@ export function createUseTable(globalOptions: IUseTableOption) {
     params: IUseTableParams<T>,
     /** 表格属性 */
     // props?: any,
-    options?: Omit<IUseTableOption, "component">
+    options?: Omit<IUseTableOption, "component"> & IExt
   ): IUserTableReturn<T> {
     _indexName = options?.req?.reName?.index || _indexName;
     _sizeName = options?.req?.reName?.size || _sizeName;
@@ -86,7 +90,7 @@ export function createUseTable(globalOptions: IUseTableOption) {
       try {
         const res = await params?.requestApi({ ...pageInfo, ...searchInfo });
         if (!res.success) return;
-        pageInfo.total = eval(`res.data.${_listTotal}`); 
+        pageInfo.total = eval(`res.data.${_listTotal}`);
         tableData.value = eval(`res.data.${_listName}`);
       } catch (error) {
         console.log(error);
@@ -148,7 +152,7 @@ export function createUseTable(globalOptions: IUseTableOption) {
         // jsx实现
         // return () => <globalOptions.component>{_collectSlots}</globalOptions.component>
         // h实现
-        return () => h(globalOptions.component,null,_collectSlots)
+        return () => h(globalOptions.component, null, _collectSlots);
       }
     });
 

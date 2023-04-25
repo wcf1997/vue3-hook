@@ -111,6 +111,7 @@ export function createUseList(globalOptions: IUseListOption) {
     }
 
     const UseListComponent = defineComponent({
+      //@ts-ignore
       setup(props, { slots }) {
         if (params.dataSource) {
           if (isRef(params.dataSource)) {
