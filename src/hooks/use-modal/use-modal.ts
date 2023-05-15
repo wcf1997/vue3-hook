@@ -74,7 +74,7 @@ export function createModalComponent(template: Component) {
         }
       });
 
-      function open(args: any): Promise<any> {
+      function open(args?: any): Promise<any> {
         arguements = { ...arguements, ...args };
         return new Promise(resolve => {
           closeResolve = resolve;

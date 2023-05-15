@@ -153,6 +153,37 @@ var _token = Symbol('provide token');
 function useInject() {
   return inject(_token);
 }
+function useTryCatch(requestApi) {
+  var args = [];
+  for (var _i = 1; _i < arguments.length; _i++) {
+    args[_i - 1] = arguments[_i];
+  }
+  return __awaiter(this, void 0, void 0, function () {
+    var res, isError, isFinally;
+    return __generator(this, function (_a) {
+      switch (_a.label) {
+        case 0:
+          isError = false, isFinally = false;
+          _a.label = 1;
+        case 1:
+          _a.trys.push([1, 3, 4, 5]);
+          return [4 /*yield*/, requestApi.apply(requestApi, args)];
+        case 2:
+          res = _a.sent();
+          return [3 /*break*/, 5];
+        case 3:
+          _a.sent();
+          isError = true;
+          return [3 /*break*/, 5];
+        case 4:
+          isFinally = true;
+          return [7 /*endfinally*/];
+        case 5:
+          return [2 /*return*/, [res, isError, isFinally]];
+      }
+    });
+  });
+}
 
 /** 收集插槽 */
 function collectSlots(columns, slot) {
@@ -514,4 +545,4 @@ function createUseList(globalOptions) {
   };
 }
 
-export { createModalComponent, createUseList, createUseModal, createUseTable, useInject };
+export { createModalComponent, createUseList, createUseModal, createUseTable, useInject, useTryCatch };

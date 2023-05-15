@@ -1,5 +1,5 @@
 import { createUseTable } from "./hooks/use-table/use-table";
-import { useInject } from "./hooks/utils";
+import { useInject, useTryCatch } from "./hooks/utils";
 import { createModalComponent, createUseModal } from "./hooks/use-modal/use-modal";
 import { createUseList } from "./hooks/use-list/use-list";
 import { IModalInject } from "./hooks/use-modal/types";
@@ -13,5 +13,6 @@ export {
   createModalComponent,
   IModalInject,
   IColumns,
-  IUseListInject
+  IUseListInject,
+  useTryCatch
 };
