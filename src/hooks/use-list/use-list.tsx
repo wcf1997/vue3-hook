@@ -56,7 +56,11 @@ export function createUseList(globalOptions: IUseListOption) {
     const searchInfo = ref({});
 
     async function getDataSource(): Promise<any> {
-      if (!params.requestApi) return (finished.value = true);
+      if (!params.requestApi) {
+        finished.value = true;
+        loading.value = false;
+        return;
+      }
       // 异步更新数据
       try {
         // loading.value = true;
@@ -142,8 +146,8 @@ export function createUseList(globalOptions: IUseListOption) {
         // h函数实现
         return () =>
           h(globalOptions.component, null, {
-            default: (data: { index: number;text:string, data: T }) =>
-            //@ts-ignore
+            default: (data: { index: number; text: string; data: T }) =>
+              //@ts-ignore
               slots.default(data.data)
           });
       }
