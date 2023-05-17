@@ -75,7 +75,9 @@ export function createUseList(globalOptions: IUseListOption) {
 
         dataSource.value = [
           ...dataSource.value,
-          ...eval(`res.data.${_listName}`)
+          ...(res.data instanceof Array
+            ? res.data
+            : eval(`res.data.${_listName}`))
         ];
         pageInfo.total = eval(`res.data.${_listTotal}`) || 0;
 
