@@ -442,7 +442,19 @@ function createUseList(globalOptions) {
         return __generator(this, function (_a) {
           switch (_a.label) {
             case 0:
-              if (!params.requestApi) return [2 /*return*/, finished.value = true];
+              if (!params.requestApi) {
+                if (params.dataSource) {
+                  if (isRef(params.dataSource)) {
+                    dataSource.value = params.dataSource.value;
+                  } else {
+                    dataSource.value = __spreadArray([], params.dataSource, true);
+                  }
+                }
+                finished.value = true;
+                loading.value = false;
+                return [2 /*return*/];
+              }
+
               _a.label = 1;
             case 1:
               _a.trys.push([1, 3, 4, 5]);
@@ -457,7 +469,7 @@ function createUseList(globalOptions) {
                 return [2 /*return*/];
               }
 
-              dataSource.value = __spreadArray(__spreadArray([], dataSource.value, true), eval("res.data.".concat(_listName)), true);
+              dataSource.value = __spreadArray(__spreadArray([], dataSource.value, true), res.data instanceof Array ? res.data : eval("res.data.".concat(_listName)), true);
               pageInfo.total = eval("res.data.".concat(_listTotal)) || 0;
               // total.value =
               // 加载状态结束
@@ -500,15 +512,6 @@ function createUseList(globalOptions) {
       //@ts-ignore
       setup: function setup(props, _a) {
         var slots = _a.slots;
-        if (params.dataSource) {
-          if (isRef(params.dataSource)) {
-            dataSource.value = params.dataSource.value;
-          } else {
-            dataSource.value = __spreadArray([], params.dataSource, true);
-          }
-          finished.value = true;
-          loading.value = false;
-        }
         provide(_token, {
           getDataSource: getDataSource,
           loading: loading,
