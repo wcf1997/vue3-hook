@@ -57,8 +57,16 @@ export function createUseList(globalOptions: IUseListOption) {
 
     async function getDataSource(): Promise<any> {
       if (!params.requestApi) {
-        finished.value = true;
-        loading.value = false;
+       
+        if (params.dataSource) {
+          if (isRef(params.dataSource)) {
+            dataSource.value = params.dataSource.value;
+          } else {
+            dataSource.value = [...params.dataSource];
+          }
+        }
+         finished.value = true;
+         loading.value = false;
         return;
       }
       // 异步更新数据
@@ -119,15 +127,7 @@ export function createUseList(globalOptions: IUseListOption) {
     const UseListComponent = defineComponent({
       //@ts-ignore
       setup(props, { slots }) {
-        if (params.dataSource) {
-          if (isRef(params.dataSource)) {
-            dataSource.value = params.dataSource.value;
-          } else {
-            dataSource.value = [...params.dataSource];
-          }
-          finished.value = true;
-          loading.value = false;
-        }
+        
         provide(_token, {
           getDataSource,
           loading,
