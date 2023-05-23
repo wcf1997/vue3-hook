@@ -75,7 +75,7 @@ export function createUseList(globalOptions: IUseListOption) {
         pageInfo[_indexName]++;
 
         let res = await params.requestApi(
-          { ...params.params, ...searchInfo },
+          { ...params.params, ...searchInfo.value },
           pageInfo[_indexName],
           pageInfo[_sizeName]
         );
