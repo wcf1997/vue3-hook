@@ -3,7 +3,6 @@ import {
   defineComponent,
   isRef,
   provide,
-  reactive,
   Ref,
   ref,
   h

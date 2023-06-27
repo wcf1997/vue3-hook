@@ -1,4 +1,4 @@
-import { inject, ref, reactive, computed, defineComponent, provide, h, unref, render, Teleport, isRef } from 'vue';
+import { inject, ref, reactive, computed, defineComponent, provide, h, unref, readonly, render, Teleport, isRef } from 'vue';
 
 /******************************************************************************
 Copyright (c) Microsoft Corporation.
@@ -346,13 +346,29 @@ function createUseModal(template) {
   return function useModal(content, args) {
     return new Promise(function (resolve) {
       var visible = ref(false);
+      var loading = ref(false);
+      var confirmEvent = ref();
+      function onConfirm() {
+        return new Promise(function (resolve) {
+          confirmEvent.value = function () {
+            return resolve(true);
+          };
+        });
+      }
+      function setLoading(isLoading) {
+        loading.value = isLoading;
+      }
       var ModalVnode = defineComponent({
         setup: function setup() {
           provide(_token, {
             visible: visible,
             close: close,
             content: content,
-            args: args
+            args: args,
+            loading: readonly(loading),
+            onConfirmEvent: readonly(confirmEvent),
+            onConfirm: onConfirm,
+            setLoading: setLoading
           });
           return function () {
             return h(template);
@@ -389,13 +405,29 @@ function createModalComponent(template) {
       visible.value = false;
       closeResolve(data);
     }
+    var loading = ref(false);
+    var confirmEvent = ref();
+    function onConfirm() {
+      return new Promise(function (resolve) {
+        confirmEvent.value = function () {
+          return resolve(true);
+        };
+      });
+    }
+    function setLoading(isLoading) {
+      loading.value = isLoading;
+    }
     var UseDialogComponent = defineComponent({
       setup: function setup() {
         provide(_token, {
           visible: visible,
           close: close,
           content: content,
-          args: arguements
+          args: arguements,
+          loading: readonly(loading),
+          onConfirmEvent: readonly(confirmEvent),
+          onConfirm: onConfirm,
+          setLoading: setLoading
         });
         return function () {
           return h(Teleport, {
@@ -434,7 +466,7 @@ function createUseList(globalOptions) {
     var finished = ref(false);
     var loading = ref(false);
     var dataSource = ref([]);
-    var pageInfo = reactive((_a = {}, _a[_indexName] = 0, _a[_sizeName] = 10, _a.total = 0, _a));
+    var pageInfo = (_a = {}, _a[_indexName] = 0, _a[_sizeName] = 10, _a.total = 0, _a);
     var searchInfo = ref({});
     function getDataSource() {
       return __awaiter(this, void 0, void 0, function () {
@@ -460,7 +492,7 @@ function createUseList(globalOptions) {
               _a.trys.push([1, 3, 4, 5]);
               // loading.value = true;
               pageInfo[_indexName]++;
-              return [4 /*yield*/, params.requestApi(__assign(__assign({}, params.params), searchInfo), pageInfo[_indexName], pageInfo[_sizeName])];
+              return [4 /*yield*/, params.requestApi(__assign(__assign({}, params.params), searchInfo.value), pageInfo[_indexName], pageInfo[_sizeName])];
             case 2:
               res = _a.sent();
               if (!res.success) {
