@@ -73,7 +73,7 @@ export function createModalComponent(template: Component) {
           return () => h(Teleport, { to: "body" }, h(template));
         }
       });
-
+      
       function open(args?: any): Promise<any> {
         arguements = { ...arguements, ...args };
         return new Promise(resolve => {

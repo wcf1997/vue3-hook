@@ -48,11 +48,11 @@ export function createUseList(globalOptions: IUseListOption) {
     const finished = ref(false);
     const loading = ref(false);
     const dataSource = ref<T[]>([]) as Ref<T[]>;
-    const pageInfo = reactive({
+    const pageInfo = {
       [_indexName]: 0,
       [_sizeName]: 10,
       total: 0
-    });
+    };
     const searchInfo = ref({});
 
     async function getDataSource(): Promise<any> {

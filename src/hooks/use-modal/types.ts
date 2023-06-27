@@ -3,4 +3,5 @@ export interface IModalInject {
   close:(...args:any) => any
   content:Comment
   args:any
+  onOk?:(fn:(...args:any) => any) => any
 }
