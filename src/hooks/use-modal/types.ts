@@ -1,4 +1,4 @@
-import { Ref } from "vue"
+import { Component, Ref } from "vue"
 
 export interface IModalInject {
   visible:boolean
@@ -10,4 +10,9 @@ export interface IModalInject {
   onConfirm:() => Promise<any>
   onConfirmEvent:Ref<(...args:any) => any>
 
+}
+
+export interface NotificationApiInjection {
+  useModal: (content: Component, args: any) => Promise<any>;
+  useDrawer: (content: Component, args: any) => Promise<any>;
 }

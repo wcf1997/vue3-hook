@@ -3,12 +3,17 @@ import {
   h,
   provide,
   ref,
-  render,
-  Teleport,
-  type Component,
-  readonly
+  readonly,
+  Ref,
+  inject,
+  markRaw
 } from "vue";
-import { _token } from "../utils";
+import { _provideKey, _token } from "../utils";
+
+/**
+ * 废弃
+ * @param template 
+ * @returns 
 
 export function createUseModal(template: Component) {
   if (!template) {
@@ -112,3 +117,54 @@ export function createModalComponent(template: Component) {
     return { open, UseDialogComponent };
   };
 }
+*/
+export const useProvideModalComponent = markRaw(
+  defineComponent({
+    props: ["args", "content", "uniqueId", "template", "close"],
+    setup(props) {
+
+      const visible = ref<boolean>(true);
+      let arguements = props.args || {};
+      const { popupComponentList } = inject(_provideKey) as {
+        popupComponentList: Ref<any[]>;
+      };
+      const loading = ref<boolean>(false);
+      let confirmEvent = ref<(...args: any) => any>();
+      function onConfirm() {
+        return new Promise(resolve => {
+          confirmEvent.value = () => resolve(true);
+        });
+      }
+      function setLoading(isLoading: boolean) {
+        loading.value = isLoading;
+      }
+
+      function close(data: any) {
+        visible.value = false;
+        props.close(data);
+        const timer = setTimeout(() => {
+          const index = popupComponentList.value.findIndex(
+            v => v.id === props.uniqueId
+          );
+          if (index > -1) {
+            popupComponentList.value.splice(index, 1);
+          }
+
+          clearTimeout(timer);
+        }, 300);
+      }
+      provide(_token, {
+        visible,
+        close,
+        content: props.content,
+        args: arguements,
+        loading: readonly(loading),
+        onConfirmEvent: readonly(confirmEvent),
+        onConfirm,
+        setLoading
+      });
+
+      return () => h(props.template);
+    }
+  })
+);
