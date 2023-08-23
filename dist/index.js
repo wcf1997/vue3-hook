@@ -598,7 +598,12 @@ export function createModalComponent(template: Component) {
 var useProvideModalComponent = markRaw(defineComponent({
   props: ["args", "content", "uniqueId", "template", "close"],
   setup: function setup(props) {
-    var visible = ref(true);
+    var visible = ref(false);
+    // 用定时器防止没有加载动画
+    var visibleTimer = setTimeout(function () {
+      visible.value = true;
+      clearTimeout(visibleTimer);
+    }, 50);
     var arguements = props.args || {};
     var popupComponentList = inject(_provideKey).popupComponentList;
     var loading = ref(false);
