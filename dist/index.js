@@ -1,4 +1,4 @@
-import { inject, ref, reactive, computed, defineComponent, provide, h, unref, readonly, render, Teleport, isRef } from 'vue';
+import { inject, ref, reactive, computed, defineComponent, provide, h, unref, isRef, markRaw, readonly, createVNode, Fragment, Teleport, isVNode } from 'vue';
 
 /******************************************************************************
 Copyright (c) Microsoft Corporation.
@@ -150,8 +150,26 @@ function __spreadArray(to, from, pack) {
 }
 
 var _token = Symbol('provide token');
+var _modalKey = Symbol("modal and drawer");
+var _provideKey = Symbol("Privacy data");
+/** 模态框、抽屉内部注入的参数 */
 function useInject() {
   return inject(_token);
+}
+/** 模态框、抽屉外层依赖注入 */
+function usePopup() {
+  var api = inject(_modalKey);
+  return api;
+}
+/** 模态框单独使用 */
+function useModal() {
+  var api = inject(_modalKey);
+  return api.useModal;
+}
+/** 抽屉单独使用 */
+function useDrawer() {
+  var api = inject(_modalKey);
+  return api.useDrawer;
 }
 function useTryCatch(requestApi) {
   var args = [];
@@ -339,117 +357,6 @@ function createUseTable(globalOptions) {
   };
 }
 
-function createUseModal(template) {
-  if (!template) {
-    throw new Error("请配置弹窗模板");
-  }
-  return function useModal(content, args) {
-    return new Promise(function (resolve) {
-      var visible = ref(false);
-      var loading = ref(false);
-      var confirmEvent = ref();
-      function onConfirm() {
-        return new Promise(function (resolve) {
-          confirmEvent.value = function () {
-            return resolve(true);
-          };
-        });
-      }
-      function setLoading(isLoading) {
-        loading.value = isLoading;
-      }
-      var ModalVnode = defineComponent({
-        setup: function setup() {
-          provide(_token, {
-            visible: visible,
-            close: close,
-            content: content,
-            args: args,
-            loading: readonly(loading),
-            onConfirmEvent: readonly(confirmEvent),
-            onConfirm: onConfirm,
-            setLoading: setLoading
-          });
-          return function () {
-            return h(template);
-          };
-        }
-      });
-      var divWrap = document.createElement("div");
-      document.body.appendChild(divWrap);
-      function close(data) {
-        visible.value = false;
-        resolve(data);
-        var timer = setTimeout(function () {
-          divWrap.remove();
-          clearTimeout(timer);
-        });
-      }
-      var timer = setTimeout(function () {
-        render(h(ModalVnode), divWrap);
-        visible.value = true;
-        clearTimeout(timer);
-      });
-    });
-  };
-}
-function createModalComponent(template) {
-  if (!template) {
-    throw new Error("请配置弹窗模板");
-  }
-  return function useDialog(content, args) {
-    var visible = ref(false);
-    var closeResolve = null;
-    var arguements = args || {};
-    function close(data) {
-      visible.value = false;
-      closeResolve(data);
-    }
-    var loading = ref(false);
-    var confirmEvent = ref();
-    function onConfirm() {
-      return new Promise(function (resolve) {
-        confirmEvent.value = function () {
-          return resolve(true);
-        };
-      });
-    }
-    function setLoading(isLoading) {
-      loading.value = isLoading;
-    }
-    var UseDialogComponent = defineComponent({
-      setup: function setup() {
-        provide(_token, {
-          visible: visible,
-          close: close,
-          content: content,
-          args: arguements,
-          loading: readonly(loading),
-          onConfirmEvent: readonly(confirmEvent),
-          onConfirm: onConfirm,
-          setLoading: setLoading
-        });
-        return function () {
-          return h(Teleport, {
-            to: "body"
-          }, h(template));
-        };
-      }
-    });
-    function open(args) {
-      arguements = __assign(__assign({}, arguements), args);
-      return new Promise(function (resolve) {
-        closeResolve = resolve;
-        visible.value = true;
-      });
-    }
-    return {
-      open: open,
-      UseDialogComponent: UseDialogComponent
-    };
-  };
-}
-
 function createUseList(globalOptions) {
   var _a, _b, _c, _d, _e, _f, _g, _h;
   var _indexName = ((_b = (_a = globalOptions.req) === null || _a === void 0 ? void 0 : _a.reName) === null || _b === void 0 ? void 0 : _b.index) || "index";
@@ -580,4 +487,262 @@ function createUseList(globalOptions) {
   };
 }
 
-export { createModalComponent, createUseList, createUseModal, createUseTable, useInject, useTryCatch };
+/**
+ * 废弃
+ * @param template
+ * @returns
+
+export function createUseModal(template: Component) {
+  if (!template) {
+    throw new Error("请配置弹窗模板");
+  }
+  return function useModal(content?: Component, args?: any): Promise<any> {
+    return new Promise(resolve => {
+      const visible = ref<boolean>(false);
+      const loading = ref<boolean>(false);
+      let confirmEvent = ref<(...args: any) => any>();
+      function onConfirm() {
+        return new Promise(resolve => {
+          confirmEvent.value = () => resolve(true);
+        });
+      }
+      function setLoading(isLoading: boolean) {
+        loading.value = isLoading;
+      }
+      const ModalVnode = defineComponent({
+        setup() {
+          provide(_token, {
+            visible,
+            close,
+            content,
+            args,
+            loading: readonly(loading),
+            onConfirmEvent: readonly(confirmEvent),
+            onConfirm,
+            setLoading
+          });
+          return () => h(template);
+        }
+      });
+
+      const divWrap = document.createElement("div");
+
+      document.body.appendChild(divWrap);
+      function close(data: any) {
+        visible.value = false;
+        resolve(data);
+        let timer = setTimeout(() => {
+          divWrap.remove();
+          clearTimeout(timer);
+        });
+      }
+
+      let timer = setTimeout(() => {
+        render(h(ModalVnode), divWrap);
+        visible.value = true;
+        clearTimeout(timer);
+      });
+    });
+  };
+}
+
+export function createModalComponent(template: Component) {
+  if (!template) {
+    throw new Error("请配置弹窗模板");
+  }
+  return function useDialog(content?: Component, args?: any) {
+    const visible = ref<boolean>(false);
+    let closeResolve: any = null;
+    let arguements = args || {};
+    function close(data: any) {
+      visible.value = false;
+      closeResolve(data);
+    }
+    const loading = ref<boolean>(false);
+    let confirmEvent = ref<(...args: any) => any>();
+    function onConfirm() {
+      return new Promise(resolve => {
+        confirmEvent.value = () => resolve(true);
+      });
+    }
+    function setLoading(isLoading: boolean) {
+      loading.value = isLoading;
+    }
+    const UseDialogComponent = defineComponent({
+      setup() {
+        provide(_token, {
+          visible,
+          close,
+          content,
+          args: arguements,
+          loading: readonly(loading),
+          onConfirmEvent: readonly(confirmEvent),
+          onConfirm,
+          setLoading
+        });
+        return () => h(Teleport, { to: "body" }, h(template));
+      }
+    });
+
+    function open(args?: any): Promise<any> {
+      arguements = { ...arguements, ...args };
+      return new Promise(resolve => {
+        closeResolve = resolve;
+        visible.value = true;
+      });
+    }
+    return { open, UseDialogComponent };
+  };
+}
+*/
+var useProvideModalComponent = markRaw(defineComponent({
+  props: ["args", "content", "uniqueId", "template", "close"],
+  setup: function setup(props) {
+    var visible = ref(true);
+    var arguements = props.args || {};
+    var popupComponentList = inject(_provideKey).popupComponentList;
+    var loading = ref(false);
+    /** 本地报错onOK中的事件并且下发的onOK事件， responseFn不存在时不能触发，存在时会触发函数 */
+    var responseFn;
+    function onOk(fn) {
+      if (fn === void 0) {
+        fn = undefined;
+      }
+      if (!responseFn) {
+        if (fn && fn instanceof Function) {
+          responseFn = fn;
+          return;
+        }
+      } else {
+        responseFn();
+      }
+    }
+    function setLoading(isLoading) {
+      loading.value = isLoading;
+    }
+    function close(data) {
+      if (data === void 0) {
+        data = false;
+      }
+      visible.value = false;
+      props.close(data);
+      var timer = setTimeout(function () {
+        var index = popupComponentList.value.findIndex(function (v) {
+          return v.id === props.uniqueId;
+        });
+        if (index > -1) {
+          popupComponentList.value.splice(index, 1);
+        }
+        clearTimeout(timer);
+      }, 300);
+    }
+    provide(_token, {
+      visible: visible,
+      close: close,
+      content: props.content,
+      args: arguements,
+      loading: readonly(loading),
+      onOk: onOk,
+      setLoading: setLoading
+    });
+    return function () {
+      return h(props.template);
+    };
+  }
+}));
+
+function _isSlot(s) {
+  return typeof s === 'function' || Object.prototype.toString.call(s) === '[object Object]' && !isVNode(s);
+}
+function createId() {
+  return "".concat(new Date().getTime());
+}
+var customPopupProvide = defineComponent({
+  name: "CustomPopupProvide",
+  // props: notificationProviderProps,
+  props: {
+    modalTemplate: null,
+    drawerTemplate: null
+  },
+  setup: function setup(props) {
+    // const { mergedClsPrefixRef } = useConfig(props);
+    var popupList = ref([]);
+    function useModal(content, args) {
+      if (args === void 0) {
+        args = "asdafasfasfalkdaskld";
+      }
+      return new Promise(function (resolve) {
+        var id = createId();
+        var ModalComponent = markRaw(useProvideModalComponent);
+        popupList.value.push({
+          id: id,
+          vnode: ModalComponent,
+          content: markRaw(content),
+          args: args,
+          close: resolve,
+          template: markRaw(props.modalTemplate)
+        });
+      });
+    }
+    function useDrawer(content, args) {
+      return new Promise(function (resolve) {
+        var id = createId();
+        var ModalComponent = markRaw(useProvideModalComponent);
+        popupList.value.push({
+          id: id,
+          vnode: ModalComponent,
+          content: markRaw(content),
+          args: args,
+          close: resolve,
+          template: markRaw(props.drawerTemplate)
+        });
+      });
+    }
+    var api = {
+      useModal: useModal,
+      useDrawer: useDrawer
+    };
+    provide(_modalKey, api);
+    provide(_provideKey, {
+      popupComponentList: popupList
+    });
+    // provide(_modalKey, {
+    //   props,
+    //   wipTransitionCountRef
+    // });
+    // deprecated
+    // function open(options: NotificationOptions): NotificationReactive {
+    //   return create(options);
+    // }
+    // function destroyAll(): void {
+    //   Object.values(notificationListRef.value).forEach(notification => {
+    //     notification.hide();
+    //   });
+    // }
+    return Object.assign({
+      popupList: popupList
+      // handleAfterLeave
+    }, api);
+  },
+  render: function render() {
+    var _slot;
+    var _a, _b;
+    return createVNode(Fragment, null, [(_b = (_a = this.$slots)["default"]) === null || _b === void 0 ? void 0 : _b.call(_a), this.popupList.length ? createVNode(Teleport, {
+      "to": "body"
+    }, _isSlot(_slot = this.popupList.map(function (vn) {
+      return createVNode(vn.vnode, {
+        "content": vn.content,
+        "uniqueId": vn.id,
+        "args": vn.args,
+        "close": vn.close,
+        "template": vn.template
+      }, null);
+    })) ? _slot : {
+      "default": function _default() {
+        return [_slot];
+      }
+    }) : null]);
+  }
+});
+
+export { customPopupProvide as CustomPopupProvide, createUseList, createUseTable, useDrawer, useInject, useModal, usePopup, useTryCatch };
