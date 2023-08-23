@@ -1,9 +1,9 @@
-import { Component, Ref } from "vue"
+import { Component, Ref, VNode } from "vue"
 
 export interface IModalInject {
   visible:boolean
   close:(...args:any) => any
-  content:Comment
+  content:VNode
   args:any
   loading:boolean
   setLoading?:(loading:boolean) => any
