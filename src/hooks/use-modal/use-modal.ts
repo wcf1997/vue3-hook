@@ -122,7 +122,13 @@ export const useProvideModalComponent = markRaw(
   defineComponent({
     props: ["args", "content", "uniqueId", "template", "close"],
     setup(props) {
-      const visible = ref<boolean>(true);
+            const visible = ref<boolean>(false);
+            // 用定时器防止没有加载动画
+            let visibleTimer = setTimeout(() => {
+              visible.value = true;
+              clearTimeout(visibleTimer);
+            }, 50);
+
       let arguements = props.args || {};
       const { popupComponentList } = inject(_provideKey) as {
         popupComponentList: Ref<any[]>;
