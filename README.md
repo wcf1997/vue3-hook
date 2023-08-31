@@ -203,7 +203,7 @@ let {UseTableComponent} = useTable({
 | render | 否| (text,record) => Component | 同上 |
 
 
-## createUseModal
+## createUseModal （v3.0已废弃）
 >  createUseModal: (component:Component) => (content:Copmonent,args:any) =>Promise<any>
 > 该方法传入一个组件，返回一个useModal函数，使用该函数创建弹窗，并在改函数内，传入弹窗内的组件
 ### 用法
@@ -276,12 +276,12 @@ const {args, close} = useInject<IModalInject>()
  |close   | (data:any) => any| 关闭弹窗并且传递数据 |
 | content   |Component | 内容组件 |
 
-## createUseModalComponent
+## createUseModalComponent创建弹窗（v3.0已废弃）
 > 由于createUseModal 中的所有组件无法读取全局组件需要手动引入，因此新增了createUseModalComponent支持使用全局组件
 
 > createUseModalComponent: (component:Component) => (content:Component,args:any) => {open, UseDialogComponent}
 
-###  createUseModalComponent用法同上
+###  createUseModalComponent用法同上 （v3.0已废弃）
 
 ### createUseModalComponent 与 createUseModal 区别
 > createUseModalComponent 创建成功后 返回 useModalComponent
@@ -299,6 +299,99 @@ const {args, close} = useInject<IModalInject>()
     // res close中传递的数据
   })
 </script>
+```
+## 模态框、抽屉函数创建（v3.0）
+### 准备ModalTemplate模板
+```vue
+<template>
+  <n-modal v-model:show="visible" transform-origin="mouse">
+    <n-card
+      :title="args && args.title"
+      :bordered="false"
+      size="huge"
+      role="dialog"
+      aria-modal="true"
+    >
+      <component :is="content"></component>
+      <template #footer v-if="args && !args.hideFooter">
+        <NSpace class="text-right" justify="end">
+          <n-button @click="onConfirm" :loading="loading" type="primary">确定</n-button
+          ><n-button @click="handleClose">取消</n-button>
+        </NSpace>
+      </template>
+    </n-card>
+  </n-modal>
+</template>
+
+<script setup lang="ts">
+import { NModal, NCard, NButton, NSpace } from 'naive-ui'
+import { useInject, type IModalInject } from 'v3-usehook'
+/**
+ * visible：控制显示隐藏
+ * args：自定义参数
+ * content：引入的内容组件
+ * close：关闭事件
+ * loading：确认按钮loading动画
+ * onOk：接管点击确认事件
+ */
+const { visible, args, content, close, loading, onOk } = useInject<IModalInject>()
+function handleClose() {
+  close(false)
+}
+function onConfirm(){
+  onOk()
+}
+</script>
+
+```
+### 步骤一：注入组件
+```vue
+<script setup>
+  import { CustomPopupProvide } from 'v3-usehook'
+  // 1、在App.vue文件中引入CustomPopupProvide组件
+  // 2、传入模态框模板以及抽屉模板
+</script>
+
+<template>
+ <CustomPopupProvide :modal-template="ModalTemplate" :drawer-template="DrawerTemplate">
+  <App />
+ </CustomPopupProvide>
+</tempalte
+
+```
+
+### 步骤二：使用组件
+```vue
+<script>
+> comp:传入的组件、args：自定义参数
+> uesModal(comp:component | VNode, args:{[propName:string]:any}): Promise<any>
+  // 用法一：
+  const { useModal, useDrawer } = usePopup()
+   function open(){
+  // 用法二：
+  const modal = useModal()
+  // 用法一：
+    useModal(/**组件 */,{title:'标题',...args},).then(res => {})
+  // 用法二：
+    modal(/**组件 */,{title:'标题',...args},).then(res => {})
+   }
+</script>
+
+<template>
+ <button @click="open">open</button>
+</tempalte
+
+```
+### 步骤三：传入的组件内获取依赖注入
+```vue
+<script>
+  const {args, close,onOk} = useInject<IModalInject>()
+</script>
+
+<template>
+ 
+</tempalte
+
 ```
 
 
