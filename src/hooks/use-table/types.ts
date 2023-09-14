@@ -89,7 +89,7 @@ export interface ICommonColumnProp {
   hideInTable?: boolean | (() => boolean);
   slot?: string;
   renderText?: (text: any, record: any) => any;
-  render?: (text: any, record: any) => VNodeChild;
+  render?: (text: any, record: any) => VNodeChild| VNode | VNode[];
 }
 export interface IParamsInject<T = any, ColumnProps = any> {
   /** 加载状态 */
