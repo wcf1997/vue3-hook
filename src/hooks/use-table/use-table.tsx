@@ -51,7 +51,7 @@ export function createUseTable<ColumnProps = any, TableProps = any>(
   let _listName = globalOptions.res?.reName?.list || "data";
   let _listTotal = globalOptions.res?.reName?.total || "total";
   return function useTable<T = any>(
-    params: IUseTableParams<T, Partial<ColumnProps> & ICommonColumnProp>,
+    params: IUseTableParams<T,ICommonColumnProp & Partial<ColumnProps>>,
     /** 表格属性 */
     tableAttrs?: Partial<TableProps> & {
       /** 是否使用列表模式 */
