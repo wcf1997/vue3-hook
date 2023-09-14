@@ -1,5 +1,4 @@
-import { Ref, VNode } from "vue";
-
+import { Component, Ref, VNode } from "vue";
 
 interface IFormItem {
   type?:
@@ -43,9 +42,9 @@ export interface IActionButton {
   isPopup?: boolean;
 }
 export interface IColumns<T = any> {
-  type?: "index" | "checkbox" | "action" | "enum";
+  type?: "index" | "checkbox" | "action" | "enum" | "selection";
   /** 字段名称 */
-  label: string;
+  label?: string;
   /** 字段对应的key */
   prop: string;
   props?: string[];
@@ -85,16 +84,20 @@ export interface ISchemaItem extends IFormItem {
 export interface ISchema {
   [prop: string]: ISchemaItem;
 }
-
-export interface IParamsInject<T = any> {
+export interface ICommonColumnProp {
+  hideInForm?: boolean | (() => boolean);
+  hideInTable?: boolean | (() => boolean);
+  slot?: string;
+  renderText?: (text: any, record: any) => any;
+  render?: (text: any, record: any) => VNode | [VNode];
+}
+export interface IParamsInject<T = any, ColumnProps = any> {
   /** 加载状态 */
   loading: Ref<boolean>;
   /** 静态数据源 */
   tableData?: Ref<T[]>;
   /** 表格列 */
-  columns: Omit<IColumns, "actions">[];
-  /** 表格操作列 */
-  actions?: (record: T, reload?: () => any) => Partial<IActionButton>[];
+  columns: ColumnProps;
   // 分页参数
   pageInfo: any;
   /** 接口 */
@@ -108,4 +111,49 @@ export interface IParamsInject<T = any> {
   handleActionButtonClick: (...args: any) => any;
   /** 表格属性 */
   attrs: any;
+}
+
+export interface IUserTableReturn<T = any> {
+  STComponent: Component;
+  /** 搜索 */
+  search: (...args: any) => any;
+  /** 重置 */
+  reload: (...args: any) => any;
+  /** 刷新 */
+  refresh: (...args: any) => any;
+  getDataSource: () => T[];
+  setDataSource: (data: T[]) => any;
+  onPageChange: (fn: () => any) => any;
+}
+
+export interface IReq {
+  req?: {
+    params?: any;
+    reName?: {
+      index?: string;
+      size?: string;
+    };
+    lazyLoad?: Boolean;
+  };
+}
+export interface IRes {
+  res?: {
+    reName?: {
+      total?: string;
+      list?: string;
+    };
+  };
+}
+export interface IUseTableOption extends IReq, IRes {
+  component: any;
+}
+
+export interface IUseTableParams<T = any, ColumnProps = IColumns>
+  extends IReq,
+    IRes {
+  requestApi?: (...args: any) => Promise<any>;
+  onLoad?: (data: any) => any;
+  dataSource?: T[];
+  columns: ColumnProps[];
+  hidePaginator?: boolean | (() => boolean);
 }

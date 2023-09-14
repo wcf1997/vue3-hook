@@ -7,8 +7,8 @@ import {
   provide,
   ref
 } from "vue";
-import { _modalKey, _provideKey, _token } from "../utils";
 import { useProvideModalComponent } from "./use-modal";
+import { _modalKey, _provideKey } from "../symbols";
 
 function createId() {
   return `${new Date().getTime()}`;

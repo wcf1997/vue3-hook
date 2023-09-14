@@ -1,38 +1,26 @@
 import {
-  Component,
   computed,
   defineComponent,
   provide,
   reactive,
   Ref,
   ref,
-  unref,
-  h
+  h,
+  readonly,
+  InjectionKey,
+  ComputedRef
 } from "vue";
-import { IReq, IRes } from "../types";
-import { _token } from "../utils";
-import { IColumns } from "./types";
 
-interface IUseTableParams<T = any> {
-  requestApi?: (...args: any) => Promise<any>;
-  dataSource?: T[];
-  columns: Omit<IColumns, "actions">[];
-  hidePaginator?: boolean;
-}
-
-interface IUserTableReturn<T = any> {
-  UseTableComponent: Component;
-  search: (...args: any) => any;
-  reload: (...args: any) => any;
-  dataSource: T[];
-}
-interface IExt  {
-  [propName:string] : any
-}
-interface IUseTableOption extends IReq, IRes {
-  component: any;
-
-}
+import { useTryCatch } from "../utils";
+import {
+  IUseTableOption,
+  IUserTableReturn,
+  IUseTableParams,
+  IColumns,
+  IParamsInject,
+  ICommonColumnProp
+} from "./types";
+import { TABLE_INJECT_KEY } from "../symbols";
 
 /** 收集插槽 */
 function collectSlots<T = any>(
@@ -44,15 +32,17 @@ function collectSlots<T = any>(
   for (const item of columns) {
     if (item["slot"]) {
       //@ts-ignore
-      slots[item.slot] = (data: { index:number,text:string,data:T }) => slot[item.slot](data.data);
+      slots[item.slot] = (data: { index: number; text: string; data: T }) =>
+        slot[item["slot"]]((data && data.data) || {});
     }
   }
 
   return slots;
 }
 
-// // 创建TableVnode
-export function createUseTable(globalOptions: IUseTableOption) {
+export function createUseTable<ColumnProps = any, TableProps = any>(
+  globalOptions: IUseTableOption
+) {
   if (!globalOptions.component) {
     throw new Error("请配置表格组件模板");
   }
@@ -61,15 +51,19 @@ export function createUseTable(globalOptions: IUseTableOption) {
   let _listName = globalOptions.res?.reName?.list || "data";
   let _listTotal = globalOptions.res?.reName?.total || "total";
   return function useTable<T = any>(
-    params: IUseTableParams<T>,
+    params: IUseTableParams<T, Partial<ColumnProps> & ICommonColumnProp>,
     /** 表格属性 */
-    // props?: any,
-    options?: Omit<IUseTableOption, "component"> & IExt
+    tableAttrs?: Partial<TableProps> & {
+      /** 是否使用列表模式 */
+      listMode?: boolean;
+      /** 分页器 */
+      pagination?: boolean;
+    }
   ): IUserTableReturn<T> {
-    _indexName = options?.req?.reName?.index || _indexName;
-    _sizeName = options?.req?.reName?.size || _sizeName;
-    _listName = options?.res?.reName?.list || _listName;
-    _listTotal = options?.res?.reName?.list || _listTotal;
+    _indexName = params?.req?.reName?.index || _indexName;
+    _sizeName = params?.req?.reName?.size || _sizeName;
+    _listName = params?.res?.reName?.list || _listName;
+    _listTotal = params?.res?.reName?.list || _listTotal;
     const loading = ref(false);
     const tableData = ref<T[]>([]) as Ref<T[]>;
     const pageInfo = reactive({
@@ -77,8 +71,16 @@ export function createUseTable(globalOptions: IUseTableOption) {
       [_sizeName]: 10,
       total: 0
     });
-
-    let searchInfo = reactive({});
+    const columns = computed(() => {
+      return params.columns.filter(v => {
+        if (v.hideInTable instanceof Function) {
+          return !v.hideInTable();
+        }
+        return !v.hideInTable;
+      });
+    });
+    let searchInfo = {};
+    let pageChangeEvnet: () => any;
 
     /** 获取表格数据 */
     async function getTalbeData() {
@@ -87,67 +89,109 @@ export function createUseTable(globalOptions: IUseTableOption) {
         pageInfo.total = params.dataSource?.length || 0;
         return;
       }
-      try {
-        const res = await params?.requestApi({ ...pageInfo, ...searchInfo });
-        if (!res.success) return;
+      loading.value = true;
+      const [res, err] = await useTryCatch(params?.requestApi, {
+        ...pageInfo,
+        ...(params?.req?.params || {}),
+        ...searchInfo
+      });
+      loading.value = false;
+      if (err || !res.success) return;
+      if (params.onLoad) {
+        params.onLoad(res.data);
+      }
+      /** 列表模式 */
+      if (tableAttrs && tableAttrs?.listMode) {
+        pageInfo.total = res.data.length;
+        tableData.value = res.data;
+        tableAttrs.pagination = false;
+      } else {
+        /** 表格模式 */
         pageInfo.total = eval(`res.data.${_listTotal}`);
         tableData.value = eval(`res.data.${_listName}`);
-      } catch (error) {
-        console.log(error);
       }
     }
-    getTalbeData();
+    if (!params.req || !params.req.lazyLoad) {
+      getTalbeData();
+    }
 
     /** 页数改变事件 */
     async function handlePageChange(currentPage: number) {
       pageInfo[_indexName] = currentPage;
-
+      if (pageChangeEvnet) {
+        pageChangeEvnet();
+      }
       getTalbeData();
     }
     /** 每页条数改变事件 */
     async function handleSizeChange(size: number) {
       pageInfo[_sizeName] = size;
+      if (pageChangeEvnet) {
+        pageChangeEvnet();
+      }
       getTalbeData();
     }
-    // 搜索
+    /** 抛出页数变化事件 */
+    function onPageChange(fn: () => any) {
+      pageChangeEvnet = fn;
+    }
+    /** 搜索 */
     function search(data: any) {
-      searchInfo = { ...data };
+      searchInfo = { ...searchInfo, ...data };
       pageInfo[_indexName] = 1;
+      pageInfo.total = 0;
       getTalbeData();
     }
-    // 重制
-    function reload() {
+    /** 重置 */
+    function reload(data: any = {}) {
       pageInfo[_indexName] = 1;
-      searchInfo = {};
+      pageInfo.total = 0;
+      searchInfo = data;
       getTalbeData();
+    }
+    /** 刷新 */
+    function refresh() {
+      getTalbeData();
+    }
+
+    // 设置异步dataSource
+    function setDataSource(data: any[]) {
+      tableData.value = data;
     }
 
     /** 操作按钮时间 */
     function handleActionButtonClick(item: any) {
       item.onClick(getTalbeData);
     }
-
-    const columns = computed<Omit<IColumns, "actions">[]>(() =>
-      params.columns.filter((v: any) => !v.hideInTable && v.type !== "action")
-    );
-    const actions = params.columns.find((v: any) => v.type === "action")?.[
-      "actions"
-    ];
+    function getDataSource() {
+      return readonly(tableData.value) as any[];
+    }
 
     const UseTableComponent = defineComponent({
-      setup(props, { slots }) {
+      setup(
+        //@ts-ignore
+        props,
+        { slots, attrs }
+      ) {
         /** 注入params */
-        provide(_token, {
-          loading,
-          columns: columns,
-          actions,
-          tableData,
-          pageInfo,
-          handlePageChange,
-          handleSizeChange,
-          handleActionButtonClick,
-          arrts: props
-        });
+        provide(
+          TABLE_INJECT_KEY as InjectionKey<
+            IParamsInject<
+              T,
+              ComputedRef<(Partial<ColumnProps> & ICommonColumnProp)[]>
+            >
+          >,
+          {
+            loading,
+            columns,
+            tableData,
+            pageInfo,
+            handlePageChange,
+            handleSizeChange,
+            handleActionButtonClick,
+            attrs: { ...(attrs || {}), ...(tableAttrs || {}) }
+          }
+        );
         const _collectSlots = collectSlots(params.columns, slots);
         // jsx实现
         // return () => <globalOptions.component>{_collectSlots}</globalOptions.component>
@@ -157,10 +201,13 @@ export function createUseTable(globalOptions: IUseTableOption) {
     });
 
     return {
-      UseTableComponent,
+      STComponent: UseTableComponent,
       search,
       reload,
-      dataSource: unref(tableData)
+      refresh,
+      getDataSource,
+      setDataSource,
+      onPageChange
     };
   };
 }
