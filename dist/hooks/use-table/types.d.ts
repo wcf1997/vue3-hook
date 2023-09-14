@@ -1,4 +1,4 @@
-import { Component, Ref, VNode } from "vue";
+import { Component, Ref, VNode, VNodeChild } from "vue";
 interface IFormItem {
     type?: "input" | "select" | "multi-select" | "date" | "cascader" | "switch" | "radio";
     /** yup验证规则 */
@@ -76,7 +76,7 @@ export interface ICommonColumnProp {
     hideInTable?: boolean | (() => boolean);
     slot?: string;
     renderText?: (text: any, record: any) => any;
-    render?: (text: any, record: any) => VNode | [VNode];
+    render?: (text: any, record: any) => VNodeChild | VNode | VNode[];
 }
 export interface IParamsInject<T = any, ColumnProps = any> {
     /** 加载状态 */
