@@ -8,7 +8,8 @@ import {
   h
 } from "vue";
 import { IReq, IRes } from "../types";
-import { _token } from "../utils";
+import { TABLE_INJECT_KEY } from "../symbols";
+// import { _token } from "../utils";
 
 interface IUseList<T = any> {
   requestApi?: (...args: any) => Promise<any>;
@@ -127,7 +128,7 @@ export function createUseList(globalOptions: IUseListOption) {
       //@ts-ignore
       setup(props, { slots }) {
         
-        provide(_token, {
+        provide(TABLE_INJECT_KEY, {
           getDataSource,
           loading,
           finished,

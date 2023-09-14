@@ -1,4 +1,4 @@
-import { inject, ref, reactive, computed, defineComponent, provide, h, unref, isRef, markRaw, readonly, createVNode, Fragment, Teleport, isVNode } from 'vue';
+import { inject, ref, reactive, computed, defineComponent, provide, h, readonly, isRef, markRaw, createVNode, Fragment, Teleport, isVNode } from 'vue';
 
 /******************************************************************************
 Copyright (c) Microsoft Corporation.
@@ -149,26 +149,28 @@ function __spreadArray(to, from, pack) {
   return to.concat(ar || Array.prototype.slice.call(from));
 }
 
-var _token = Symbol('provide token');
+var TABLE_INJECT_KEY = Symbol("Table");
+var Modal_INJECT_KEY = Symbol("Modal");
 var _modalKey = Symbol("modal and drawer");
 var _provideKey = Symbol("Privacy data");
+
 /** 模态框、抽屉内部注入的参数 */
 function useInject() {
-  return inject(_token);
+  return inject(Modal_INJECT_KEY);
 }
 /** 模态框、抽屉外层依赖注入 */
 function usePopup() {
-  var api = inject(_modalKey);
+  var api = inject(Modal_INJECT_KEY);
   return api;
 }
 /** 模态框单独使用 */
 function useModal() {
-  var api = inject(_modalKey);
+  var api = inject(Modal_INJECT_KEY);
   return api.useModal;
 }
 /** 抽屉单独使用 */
 function useDrawer() {
-  var api = inject(_modalKey);
+  var api = inject(Modal_INJECT_KEY);
   return api.useDrawer;
 }
 function useTryCatch(requestApi) {
@@ -211,7 +213,7 @@ function collectSlots(columns, slot) {
     if (item["slot"]) {
       //@ts-ignore
       slots[item.slot] = function (data) {
-        return slot[item.slot](data.data);
+        return slot[item["slot"]](data && data.data || {});
       };
     }
   };
@@ -221,7 +223,6 @@ function collectSlots(columns, slot) {
   }
   return slots;
 }
-// // 创建TableVnode
 function createUseTable(globalOptions) {
   var _a, _b, _c, _d, _e, _f, _g, _h;
   if (!globalOptions.component) {
@@ -232,25 +233,33 @@ function createUseTable(globalOptions) {
   var _listName = ((_f = (_e = globalOptions.res) === null || _e === void 0 ? void 0 : _e.reName) === null || _f === void 0 ? void 0 : _f.list) || "data";
   var _listTotal = ((_h = (_g = globalOptions.res) === null || _g === void 0 ? void 0 : _g.reName) === null || _h === void 0 ? void 0 : _h.total) || "total";
   return function useTable(params, /** 表格属性 */
-  // props?: any,
-  options) {
+  tableAttrs) {
     var _a;
-    var _b, _c, _d, _e, _f, _g, _h, _j, _k;
-    _indexName = ((_c = (_b = options === null || options === void 0 ? void 0 : options.req) === null || _b === void 0 ? void 0 : _b.reName) === null || _c === void 0 ? void 0 : _c.index) || _indexName;
-    _sizeName = ((_e = (_d = options === null || options === void 0 ? void 0 : options.req) === null || _d === void 0 ? void 0 : _d.reName) === null || _e === void 0 ? void 0 : _e.size) || _sizeName;
-    _listName = ((_g = (_f = options === null || options === void 0 ? void 0 : options.res) === null || _f === void 0 ? void 0 : _f.reName) === null || _g === void 0 ? void 0 : _g.list) || _listName;
-    _listTotal = ((_j = (_h = options === null || options === void 0 ? void 0 : options.res) === null || _h === void 0 ? void 0 : _h.reName) === null || _j === void 0 ? void 0 : _j.list) || _listTotal;
+    var _b, _c, _d, _e, _f, _g, _h, _j;
+    _indexName = ((_c = (_b = params === null || params === void 0 ? void 0 : params.req) === null || _b === void 0 ? void 0 : _b.reName) === null || _c === void 0 ? void 0 : _c.index) || _indexName;
+    _sizeName = ((_e = (_d = params === null || params === void 0 ? void 0 : params.req) === null || _d === void 0 ? void 0 : _d.reName) === null || _e === void 0 ? void 0 : _e.size) || _sizeName;
+    _listName = ((_g = (_f = params === null || params === void 0 ? void 0 : params.res) === null || _f === void 0 ? void 0 : _f.reName) === null || _g === void 0 ? void 0 : _g.list) || _listName;
+    _listTotal = ((_j = (_h = params === null || params === void 0 ? void 0 : params.res) === null || _h === void 0 ? void 0 : _h.reName) === null || _j === void 0 ? void 0 : _j.list) || _listTotal;
     var loading = ref(false);
     var tableData = ref([]);
     var pageInfo = reactive((_a = {}, _a[_indexName] = 1, _a[_sizeName] = 10, _a.total = 0, _a));
-    var searchInfo = reactive({});
+    var columns = computed(function () {
+      return params.columns.filter(function (v) {
+        if (v.hideInTable instanceof Function) {
+          return !v.hideInTable();
+        }
+        return !v.hideInTable;
+      });
+    });
+    var searchInfo = {};
+    var pageChangeEvnet;
     /** 获取表格数据 */
     function getTalbeData() {
-      var _a;
+      var _a, _b;
       return __awaiter(this, void 0, void 0, function () {
-        var res, error_1;
-        return __generator(this, function (_b) {
-          switch (_b.label) {
+        var _c, res, err;
+        return __generator(this, function (_d) {
+          switch (_d.label) {
             case 0:
               if (!(params === null || params === void 0 ? void 0 : params.requestApi)) {
                 tableData.value = (params === null || params === void 0 ? void 0 : params.dataSource) || [];
@@ -258,33 +267,42 @@ function createUseTable(globalOptions) {
                 return [2 /*return*/];
               }
 
-              _b.label = 1;
+              loading.value = true;
+              return [4 /*yield*/, useTryCatch(params === null || params === void 0 ? void 0 : params.requestApi, __assign(__assign(__assign({}, pageInfo), ((_b = params === null || params === void 0 ? void 0 : params.req) === null || _b === void 0 ? void 0 : _b.params) || {}), searchInfo))];
             case 1:
-              _b.trys.push([1, 3,, 4]);
-              return [4 /*yield*/, params === null || params === void 0 ? void 0 : params.requestApi(__assign(__assign({}, pageInfo), searchInfo))];
-            case 2:
-              res = _b.sent();
-              if (!res.success) return [2 /*return*/];
-              pageInfo.total = eval("res.data.".concat(_listTotal));
-              tableData.value = eval("res.data.".concat(_listName));
-              return [3 /*break*/, 4];
-            case 3:
-              error_1 = _b.sent();
-              console.log(error_1);
-              return [3 /*break*/, 4];
-            case 4:
+              _c = _d.sent(), res = _c[0], err = _c[1];
+              loading.value = false;
+              if (err || !res.success) return [2 /*return*/];
+              if (params.onLoad) {
+                params.onLoad(res.data);
+              }
+              /** 列表模式 */
+              if (tableAttrs && (tableAttrs === null || tableAttrs === void 0 ? void 0 : tableAttrs.listMode)) {
+                pageInfo.total = res.data.length;
+                tableData.value = res.data;
+                tableAttrs.pagination = false;
+              } else {
+                /** 表格模式 */
+                pageInfo.total = eval("res.data.".concat(_listTotal));
+                tableData.value = eval("res.data.".concat(_listName));
+              }
               return [2 /*return*/];
           }
         });
       });
     }
 
-    getTalbeData();
+    if (!params.req || !params.req.lazyLoad) {
+      getTalbeData();
+    }
     /** 页数改变事件 */
     function handlePageChange(currentPage) {
       return __awaiter(this, void 0, void 0, function () {
         return __generator(this, function (_a) {
           pageInfo[_indexName] = currentPage;
+          if (pageChangeEvnet) {
+            pageChangeEvnet();
+          }
           getTalbeData();
           return [2 /*return*/];
         });
@@ -295,49 +313,66 @@ function createUseTable(globalOptions) {
       return __awaiter(this, void 0, void 0, function () {
         return __generator(this, function (_a) {
           pageInfo[_sizeName] = size;
+          if (pageChangeEvnet) {
+            pageChangeEvnet();
+          }
           getTalbeData();
           return [2 /*return*/];
         });
       });
     }
-    // 搜索
+    /** 抛出页数变化事件 */
+    function onPageChange(fn) {
+      pageChangeEvnet = fn;
+    }
+    /** 搜索 */
     function search(data) {
-      searchInfo = __assign({}, data);
+      searchInfo = __assign(__assign({}, searchInfo), data);
       pageInfo[_indexName] = 1;
+      pageInfo.total = 0;
       getTalbeData();
     }
-    // 重制
-    function reload() {
+    /** 重置 */
+    function reload(data) {
+      if (data === void 0) {
+        data = {};
+      }
       pageInfo[_indexName] = 1;
-      searchInfo = {};
+      pageInfo.total = 0;
+      searchInfo = data;
       getTalbeData();
+    }
+    /** 刷新 */
+    function refresh() {
+      getTalbeData();
+    }
+    // 设置异步dataSource
+    function setDataSource(data) {
+      tableData.value = data;
     }
     /** 操作按钮时间 */
     function handleActionButtonClick(item) {
       item.onClick(getTalbeData);
     }
-    var columns = computed(function () {
-      return params.columns.filter(function (v) {
-        return !v.hideInTable && v.type !== "action";
-      });
-    });
-    var actions = (_k = params.columns.find(function (v) {
-      return v.type === "action";
-    })) === null || _k === void 0 ? void 0 : _k["actions"];
+    function getDataSource() {
+      return readonly(tableData.value);
+    }
     var UseTableComponent = defineComponent({
-      setup: function setup(props, _a) {
-        var slots = _a.slots;
+      setup: function setup(
+      //@ts-ignore
+      props, _a) {
+        var slots = _a.slots,
+          attrs = _a.attrs;
         /** 注入params */
-        provide(_token, {
+        provide(TABLE_INJECT_KEY, {
           loading: loading,
           columns: columns,
-          actions: actions,
           tableData: tableData,
           pageInfo: pageInfo,
           handlePageChange: handlePageChange,
           handleSizeChange: handleSizeChange,
           handleActionButtonClick: handleActionButtonClick,
-          arrts: props
+          attrs: __assign(__assign({}, attrs || {}), tableAttrs || {})
         });
         var _collectSlots = collectSlots(params.columns, slots);
         // jsx实现
@@ -349,10 +384,13 @@ function createUseTable(globalOptions) {
       }
     });
     return {
-      UseTableComponent: UseTableComponent,
+      STComponent: UseTableComponent,
       search: search,
       reload: reload,
-      dataSource: unref(tableData)
+      refresh: refresh,
+      getDataSource: getDataSource,
+      setDataSource: setDataSource,
+      onPageChange: onPageChange
     };
   };
 }
@@ -451,7 +489,7 @@ function createUseList(globalOptions) {
       //@ts-ignore
       setup: function setup(props, _a) {
         var slots = _a.slots;
-        provide(_token, {
+        provide(TABLE_INJECT_KEY, {
           getDataSource: getDataSource,
           loading: loading,
           finished: finished,
@@ -487,114 +525,7 @@ function createUseList(globalOptions) {
   };
 }
 
-/**
- * 废弃
- * @param template
- * @returns
-
-export function createUseModal(template: Component) {
-  if (!template) {
-    throw new Error("请配置弹窗模板");
-  }
-  return function useModal(content?: Component, args?: any): Promise<any> {
-    return new Promise(resolve => {
-      const visible = ref<boolean>(false);
-      const loading = ref<boolean>(false);
-      let confirmEvent = ref<(...args: any) => any>();
-      function onConfirm() {
-        return new Promise(resolve => {
-          confirmEvent.value = () => resolve(true);
-        });
-      }
-      function setLoading(isLoading: boolean) {
-        loading.value = isLoading;
-      }
-      const ModalVnode = defineComponent({
-        setup() {
-          provide(_token, {
-            visible,
-            close,
-            content,
-            args,
-            loading: readonly(loading),
-            onConfirmEvent: readonly(confirmEvent),
-            onConfirm,
-            setLoading
-          });
-          return () => h(template);
-        }
-      });
-
-      const divWrap = document.createElement("div");
-
-      document.body.appendChild(divWrap);
-      function close(data: any) {
-        visible.value = false;
-        resolve(data);
-        let timer = setTimeout(() => {
-          divWrap.remove();
-          clearTimeout(timer);
-        });
-      }
-
-      let timer = setTimeout(() => {
-        render(h(ModalVnode), divWrap);
-        visible.value = true;
-        clearTimeout(timer);
-      });
-    });
-  };
-}
-
-export function createModalComponent(template: Component) {
-  if (!template) {
-    throw new Error("请配置弹窗模板");
-  }
-  return function useDialog(content?: Component, args?: any) {
-    const visible = ref<boolean>(false);
-    let closeResolve: any = null;
-    let arguements = args || {};
-    function close(data: any) {
-      visible.value = false;
-      closeResolve(data);
-    }
-    const loading = ref<boolean>(false);
-    let confirmEvent = ref<(...args: any) => any>();
-    function onConfirm() {
-      return new Promise(resolve => {
-        confirmEvent.value = () => resolve(true);
-      });
-    }
-    function setLoading(isLoading: boolean) {
-      loading.value = isLoading;
-    }
-    const UseDialogComponent = defineComponent({
-      setup() {
-        provide(_token, {
-          visible,
-          close,
-          content,
-          args: arguements,
-          loading: readonly(loading),
-          onConfirmEvent: readonly(confirmEvent),
-          onConfirm,
-          setLoading
-        });
-        return () => h(Teleport, { to: "body" }, h(template));
-      }
-    });
-
-    function open(args?: any): Promise<any> {
-      arguements = { ...arguements, ...args };
-      return new Promise(resolve => {
-        closeResolve = resolve;
-        visible.value = true;
-      });
-    }
-    return { open, UseDialogComponent };
-  };
-}
-*/
+// import { _provideKey, _token } from "../utils";
 var useProvideModalComponent = markRaw(defineComponent({
   props: ["args", "content", "uniqueId", "template", "close"],
   setup: function setup(props) {
@@ -641,7 +572,7 @@ var useProvideModalComponent = markRaw(defineComponent({
         clearTimeout(timer);
       }, 300);
     }
-    provide(_token, {
+    provide(Modal_INJECT_KEY, {
       visible: visible,
       close: close,
       content: props.content,
