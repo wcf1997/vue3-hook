@@ -158,6 +158,9 @@ var _provideKey = Symbol("Privacy data");
 function useInject() {
   return inject(Modal_INJECT_KEY);
 }
+function useTableInject() {
+  return inject(TABLE_INJECT_KEY);
+}
 /** 模态框、抽屉外层依赖注入 */
 function usePopup() {
   var api = inject(Modal_INJECT_KEY);
@@ -681,4 +684,4 @@ var customPopupProvide = defineComponent({
   }
 });
 
-export { customPopupProvide as CustomPopupProvide, createUseList, createUseTable, useDrawer, useInject, useModal, usePopup, useTryCatch };
+export { customPopupProvide as CustomPopupProvide, createUseList, createUseTable, useDrawer, useInject, useModal, usePopup, useTableInject, useTryCatch };

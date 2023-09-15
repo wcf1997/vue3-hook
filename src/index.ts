@@ -1,5 +1,5 @@
 import { createUseTable } from "./hooks/use-table/use-table";
-import { useDrawer, useInject, useModal, usePopup, useTryCatch } from "./hooks/utils";
+import { useDrawer, useInject, useModal, usePopup, useTableInject, useTryCatch } from "./hooks/utils";
 // import { createModalComponent, createUseModal } from "./hooks/use-modal/use-modal";
 import { createUseList } from "./hooks/use-list/use-list";
 import { IModalInject } from "./hooks/use-modal/types";
@@ -9,7 +9,10 @@ import CustomPopupProvide from "./hooks/use-modal/custom-popup-provide";
 
 export {
   createUseTable,
+  /** modal and drawer inject */
   useInject,
+  /** table inject  */
+  useTableInject,
   // createUseModal,
   createUseList,
   // createModalComponent,
