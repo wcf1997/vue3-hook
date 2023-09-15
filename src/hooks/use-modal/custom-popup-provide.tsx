@@ -8,7 +8,7 @@ import {
   ref
 } from "vue";
 import { useProvideModalComponent } from "./use-modal";
-import { _modalKey, _provideKey } from "../symbols";
+import { USE_MODAL_INJECT_KEY, _provideKey } from "../symbols";
 
 function createId() {
   return `${new Date().getTime()}`;
@@ -71,11 +71,11 @@ export default defineComponent({
       useDrawer
     };
 
-    provide(_modalKey, api);
+    provide(USE_MODAL_INJECT_KEY, api);
     provide(_provideKey, {
       popupComponentList: popupList
     });
-    // provide(_modalKey, {
+    // provide(USE_MODAL_INJECT_KEY, {
     //   props,
     //   wipTransitionCountRef
     // });
