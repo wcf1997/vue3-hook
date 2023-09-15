@@ -151,7 +151,7 @@ function __spreadArray(to, from, pack) {
 
 var TABLE_INJECT_KEY = Symbol("Table");
 var Modal_INJECT_KEY = Symbol("Modal");
-var _modalKey = Symbol("modal and drawer");
+var USE_MODAL_INJECT_KEY = Symbol("useModal and useDrawer");
 var _provideKey = Symbol("Privacy data");
 
 /** 模态框、抽屉内部注入的参数 */
@@ -163,17 +163,17 @@ function useTableInject() {
 }
 /** 模态框、抽屉外层依赖注入 */
 function usePopup() {
-  var api = inject(Modal_INJECT_KEY);
+  var api = inject(USE_MODAL_INJECT_KEY);
   return api;
 }
 /** 模态框单独使用 */
 function useModal() {
-  var api = inject(Modal_INJECT_KEY);
+  var api = inject(USE_MODAL_INJECT_KEY);
   return api.useModal;
 }
 /** 抽屉单独使用 */
 function useDrawer() {
-  var api = inject(Modal_INJECT_KEY);
+  var api = inject(USE_MODAL_INJECT_KEY);
   return api.useDrawer;
 }
 function useTryCatch(requestApi) {
@@ -641,11 +641,11 @@ var customPopupProvide = defineComponent({
       useModal: useModal,
       useDrawer: useDrawer
     };
-    provide(_modalKey, api);
+    provide(USE_MODAL_INJECT_KEY, api);
     provide(_provideKey, {
       popupComponentList: popupList
     });
-    // provide(_modalKey, {
+    // provide(USE_MODAL_INJECT_KEY, {
     //   props,
     //   wipTransitionCountRef
     // });
