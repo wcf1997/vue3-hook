@@ -4,10 +4,10 @@ export interface IModalInject {
     close: (...args: any) => any;
     content: VNode;
     args: any;
-    loading: boolean;
     setLoading?: (loading: boolean) => any;
-    onConfirm: () => Promise<any>;
-    onConfirmEvent: Ref<(...args: any) => any>;
+    onConfirm: any;
+    onOk?: any;
+    loading: Ref<boolean>;
 }
 export interface NotificationApiInjection {
     useModal: (content: Component, args: any) => Promise<any>;
