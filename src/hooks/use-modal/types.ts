@@ -1,15 +1,14 @@
 import { Component, Ref, VNode } from "vue"
 
 export interface IModalInject {
-  visible:boolean
-  close:(...args:any) => any
-  content:VNode
-  args:any
-  loading:boolean
-  setLoading?:(loading:boolean) => any
-  onConfirm:() => Promise<any>
-  onConfirmEvent:Ref<(...args:any) => any>
-
+  visible: boolean;
+  close: (...args: any) => any;
+  content: VNode;
+  args: any;
+  setLoading?: (loading: boolean) => any;
+  onConfirm: any;
+  onOk?: any;
+  loading: Ref<boolean>;
 }
 
 export interface NotificationApiInjection {
