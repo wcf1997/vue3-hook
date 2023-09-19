@@ -163,17 +163,17 @@ function useTableInject() {
 }
 /** 模态框、抽屉外层依赖注入 */
 function usePopup() {
-  var api = inject(USE_MODAL_INJECT_KEY);
+  var api = inject(Modal_INJECT_KEY);
   return api;
 }
 /** 模态框单独使用 */
 function useModal() {
-  var api = inject(USE_MODAL_INJECT_KEY);
+  var api = inject(Modal_INJECT_KEY);
   return api.useModal;
 }
 /** 抽屉单独使用 */
 function useDrawer() {
-  var api = inject(USE_MODAL_INJECT_KEY);
+  var api = inject(Modal_INJECT_KEY);
   return api.useDrawer;
 }
 function useTryCatch(requestApi) {

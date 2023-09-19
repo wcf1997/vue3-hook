@@ -2,7 +2,7 @@ import { Component } from "vue";
 import { ICommonColumnProp, IParamsInject } from "./use-table/types";
 import { IModalInject, NotificationApiInjection } from "./use-modal/types";
 /** 模态框、抽屉内部注入的参数 */
-export declare function useInject(): IModalInject;
+export declare function useInject<T = IModalInject>(): T;
 export declare function useTableInject<ColumnProps = any>(): IParamsInject<any, (Partial<ColumnProps> & ICommonColumnProp)[]>;
 /** 模态框、抽屉外层依赖注入 */
 export declare function usePopup(): NotificationApiInjection;
