@@ -46,12 +46,12 @@ export function createUseTable<ColumnProps = any, TableProps = any>(
   if (!globalOptions.component) {
     throw new Error("请配置表格组件模板");
   }
-  let _indexName = globalOptions.req?.reName?.index || "index";
-  let _sizeName = globalOptions.req?.reName?.size || "size";
-  let _listName = globalOptions.res?.reName?.list || "data";
-  let _listTotal = globalOptions.res?.reName?.total || "total";
+  let indexName = globalOptions.req?.reName?.index || "index";
+  let sizeName = globalOptions.req?.reName?.size || "size";
+  let listName = globalOptions.res?.reName?.list || "data";
+  let listTotal = globalOptions.res?.reName?.total || "total";
   return function useTable<T = any>(
-    params: IUseTableParams<T,ICommonColumnProp & Partial<ColumnProps>>,
+    params: IUseTableParams<T, ICommonColumnProp & Partial<ColumnProps>>,
     /** 表格属性 */
     tableAttrs?: Partial<TableProps> & {
       /** 是否使用列表模式 */
@@ -60,10 +60,10 @@ export function createUseTable<ColumnProps = any, TableProps = any>(
       pagination?: boolean;
     }
   ): IUserTableReturn<T> {
-    _indexName = params?.req?.reName?.index || _indexName;
-    _sizeName = params?.req?.reName?.size || _sizeName;
-    _listName = params?.res?.reName?.list || _listName;
-    _listTotal = params?.res?.reName?.list || _listTotal;
+    let _indexName = params?.req?.reName?.index || indexName;
+    let _sizeName = params?.req?.reName?.size || sizeName;
+    let _listName = params?.res?.reName?.list || listName;
+    let _listTotal = params?.res?.reName?.list || listTotal;
     const loading = ref(false);
     const tableData = ref<T[]>([]) as Ref<T[]>;
     const pageInfo = reactive({
