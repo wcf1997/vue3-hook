@@ -231,18 +231,18 @@ function createUseTable(globalOptions) {
   if (!globalOptions.component) {
     throw new Error("请配置表格组件模板");
   }
-  var _indexName = ((_b = (_a = globalOptions.req) === null || _a === void 0 ? void 0 : _a.reName) === null || _b === void 0 ? void 0 : _b.index) || "index";
-  var _sizeName = ((_d = (_c = globalOptions.req) === null || _c === void 0 ? void 0 : _c.reName) === null || _d === void 0 ? void 0 : _d.size) || "size";
-  var _listName = ((_f = (_e = globalOptions.res) === null || _e === void 0 ? void 0 : _e.reName) === null || _f === void 0 ? void 0 : _f.list) || "data";
-  var _listTotal = ((_h = (_g = globalOptions.res) === null || _g === void 0 ? void 0 : _g.reName) === null || _h === void 0 ? void 0 : _h.total) || "total";
+  var indexName = ((_b = (_a = globalOptions.req) === null || _a === void 0 ? void 0 : _a.reName) === null || _b === void 0 ? void 0 : _b.index) || "index";
+  var sizeName = ((_d = (_c = globalOptions.req) === null || _c === void 0 ? void 0 : _c.reName) === null || _d === void 0 ? void 0 : _d.size) || "size";
+  var listName = ((_f = (_e = globalOptions.res) === null || _e === void 0 ? void 0 : _e.reName) === null || _f === void 0 ? void 0 : _f.list) || "data";
+  var listTotal = ((_h = (_g = globalOptions.res) === null || _g === void 0 ? void 0 : _g.reName) === null || _h === void 0 ? void 0 : _h.total) || "total";
   return function useTable(params, /** 表格属性 */
   tableAttrs) {
     var _a;
     var _b, _c, _d, _e, _f, _g, _h, _j;
-    _indexName = ((_c = (_b = params === null || params === void 0 ? void 0 : params.req) === null || _b === void 0 ? void 0 : _b.reName) === null || _c === void 0 ? void 0 : _c.index) || _indexName;
-    _sizeName = ((_e = (_d = params === null || params === void 0 ? void 0 : params.req) === null || _d === void 0 ? void 0 : _d.reName) === null || _e === void 0 ? void 0 : _e.size) || _sizeName;
-    _listName = ((_g = (_f = params === null || params === void 0 ? void 0 : params.res) === null || _f === void 0 ? void 0 : _f.reName) === null || _g === void 0 ? void 0 : _g.list) || _listName;
-    _listTotal = ((_j = (_h = params === null || params === void 0 ? void 0 : params.res) === null || _h === void 0 ? void 0 : _h.reName) === null || _j === void 0 ? void 0 : _j.list) || _listTotal;
+    var _indexName = ((_c = (_b = params === null || params === void 0 ? void 0 : params.req) === null || _b === void 0 ? void 0 : _b.reName) === null || _c === void 0 ? void 0 : _c.index) || indexName;
+    var _sizeName = ((_e = (_d = params === null || params === void 0 ? void 0 : params.req) === null || _d === void 0 ? void 0 : _d.reName) === null || _e === void 0 ? void 0 : _e.size) || sizeName;
+    var _listName = ((_g = (_f = params === null || params === void 0 ? void 0 : params.res) === null || _f === void 0 ? void 0 : _f.reName) === null || _g === void 0 ? void 0 : _g.list) || listName;
+    var _listTotal = ((_j = (_h = params === null || params === void 0 ? void 0 : params.res) === null || _h === void 0 ? void 0 : _h.reName) === null || _j === void 0 ? void 0 : _j.list) || listTotal;
     var loading = ref(false);
     var tableData = ref([]);
     var pageInfo = reactive((_a = {}, _a[_indexName] = 1, _a[_sizeName] = 10, _a.total = 0, _a));
